@@ -2,7 +2,7 @@ import * as React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Wallet } from "lucide-react";
-import { Address } from "../types";
+import { Address, ChainData } from "../types";
 import { AddressCard } from "./AddressCard";
 
 interface AddressListProps {
@@ -13,8 +13,10 @@ interface AddressListProps {
   onBalanceUpdate: (
     id: string,
     balance: number,
-    lastTransactions?: Address["lastTransactions"]
+    lastTransactions?: Address["lastTransactions"],
+    tokens?: Address["tokens"]
   ) => void;
+  onChainDataUpdate: (id: string, chainData: ChainData[]) => void;
 }
 
 export function AddressList({
@@ -23,6 +25,7 @@ export function AddressList({
   onDelete,
   onAddClick,
   onBalanceUpdate,
+  onChainDataUpdate,
 }: AddressListProps) {
   const [draggedItem, setDraggedItem] = React.useState<string | null>(null);
 
@@ -86,6 +89,7 @@ export function AddressList({
           onDrop={handleDrop}
           isDragging={draggedItem === address.id}
           onBalanceUpdate={onBalanceUpdate}
+          onChainDataUpdate={onChainDataUpdate}
         />
       ))}
     </div>

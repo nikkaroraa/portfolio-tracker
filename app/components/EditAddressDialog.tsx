@@ -20,7 +20,6 @@ import {
 import {
   Address,
   SUPPORTED_CHAINS,
-  SUPPORTED_ETHEREUM_NETWORKS,
 } from "../types";
 
 interface EditAddressDialogProps {
@@ -97,24 +96,9 @@ export function EditAddressDialog({
           </div>
           {formData.chain === "ethereum" && (
             <div className="grid gap-2">
-              <Label htmlFor="edit-network">Ethereum Network</Label>
-              <Select
-                value={formData.network || "mainnet"}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, network: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {SUPPORTED_ETHEREUM_NETWORKS.map((net) => (
-                    <SelectItem key={net.value} value={net.value}>
-                      {net.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label className="text-sm text-muted-foreground">
+                All Ethereum-compatible chains will be tracked automatically
+              </Label>
             </div>
           )}
           <div className="grid gap-2">

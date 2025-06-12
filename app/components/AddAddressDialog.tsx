@@ -17,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { SUPPORTED_CHAINS, SUPPORTED_ETHEREUM_NETWORKS } from "../types";
+import { SUPPORTED_CHAINS } from "../types";
 
 interface AddAddressDialogProps {
   open: boolean;
@@ -95,24 +95,9 @@ export function AddAddressDialog({
           </div>
           {formData.chain === "ethereum" && (
             <div className="grid gap-2">
-              <Label htmlFor="network">Ethereum Network</Label>
-              <Select
-                value={formData.network}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, network: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select network" />
-                </SelectTrigger>
-                <SelectContent>
-                  {SUPPORTED_ETHEREUM_NETWORKS.map((net) => (
-                    <SelectItem key={net.value} value={net.value}>
-                      {net.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label className="text-sm text-muted-foreground">
+                All Ethereum-compatible chains will be tracked automatically
+              </Label>
             </div>
           )}
           <div className="grid gap-2">

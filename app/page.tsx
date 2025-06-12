@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useState } from "react";
-import { Address } from "./types";
+import { Address, ChainData } from "./types";
 import { Header } from "./components/Header";
 import { AddressList } from "./components/AddressList";
 import { AddAddressDialog } from "./components/AddAddressDialog";
@@ -88,6 +88,20 @@ export default function Page() {
     );
   };
 
+  const handleChainDataUpdate = (id: string, chainData: ChainData[]) => {
+    setAddresses(
+      addresses.map((addr) =>
+        addr.id === id
+          ? {
+              ...addr,
+              chainData,
+              lastUpdated: new Date(),
+            }
+          : addr
+      )
+    );
+  };
+
   return (
     <div className="container mx-auto p-6 max-w-4xl">
       <Header
@@ -105,6 +119,7 @@ export default function Page() {
         onDelete={handleDeleteAddress}
         onAddClick={() => setIsAddDialogOpen(true)}
         onBalanceUpdate={handleBalanceUpdate}
+        onChainDataUpdate={handleChainDataUpdate}
       />
 
       <AddAddressDialog
