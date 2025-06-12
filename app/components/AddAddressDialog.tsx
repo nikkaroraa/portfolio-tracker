@@ -17,12 +17,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { SUPPORTED_CHAINS } from "../types";
+import { SUPPORTED_CHAINS, SUPPORTED_ETHEREUM_NETWORKS } from "../types";
 
 interface AddAddressDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: { label: string; address: string; chain: string }) => void;
+  onSubmit: (data: {
+    label: string;
+    address: string;
+    chain: string;
+    network: string;
+  }) => void;
 }
 
 export function AddAddressDialog({
@@ -34,12 +39,13 @@ export function AddAddressDialog({
     label: "",
     address: "",
     chain: "",
+    network: "mainnet",
   });
 
   const handleSubmit = () => {
     if (formData.label && formData.address && formData.chain) {
       onSubmit(formData);
-      setFormData({ label: "", address: "", chain: "" });
+      setFormData({ label: "", address: "", chain: "", network: "mainnet" });
     }
   };
 
@@ -69,7 +75,7 @@ export function AddAddressDialog({
             <Select
               value={formData.chain}
               onValueChange={(value) =>
-                setFormData({ ...formData, chain: value })
+                setFormData({ ...formData, chain: value, network: "mainnet" })
               }
             >
               <SelectTrigger>
@@ -87,6 +93,28 @@ export function AddAddressDialog({
               </SelectContent>
             </Select>
           </div>
+          {formData.chain === "ethereum" && (
+            <div className="grid gap-2">
+              <Label htmlFor="network">Ethereum Network</Label>
+              <Select
+                value={formData.network}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, network: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select network" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SUPPORTED_ETHEREUM_NETWORKS.map((net) => (
+                    <SelectItem key={net.value} value={net.value}>
+                      {net.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="grid gap-2">
             <Label htmlFor="address">Address</Label>
             <Input

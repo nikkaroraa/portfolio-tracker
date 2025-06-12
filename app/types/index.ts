@@ -1,15 +1,26 @@
+export interface TokenBalance {
+  contractAddress: string;
+  symbol: string;
+  name: string;
+  balance: string;
+  decimals: number;
+}
+
 export interface Address {
   id: string;
   label: string;
   address: string;
   chain: string;
+  network?: string;
   balance?: number;
   lastUpdated?: Date;
+  tokens?: TokenBalance[];
   lastTransactions?: Array<{
     hash: string;
     timestamp: number;
     value: number;
     type: "sent" | "received";
+    asset?: string;
   }>;
 }
 
@@ -46,4 +57,12 @@ export const SUPPORTED_CHAINS: ChainInfo[] = [
   { value: "ethereum", label: "Ethereum", symbol: "ETH", color: "bg-blue-500" },
   { value: "solana", label: "Solana", symbol: "SOL", color: "bg-purple-500" },
   { value: "zcash", label: "Zcash", symbol: "ZEC", color: "bg-yellow-500" },
+];
+
+export const SUPPORTED_ETHEREUM_NETWORKS = [
+  { value: "mainnet", label: "Ethereum Mainnet" },
+  { value: "arbitrum", label: "Arbitrum One" },
+  { value: "polygon", label: "Polygon" },
+  { value: "optimism", label: "Optimism" },
+  { value: "base", label: "Base" },
 ];

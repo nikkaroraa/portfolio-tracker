@@ -17,7 +17,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Address, SUPPORTED_CHAINS } from "../types";
+import {
+  Address,
+  SUPPORTED_CHAINS,
+  SUPPORTED_ETHEREUM_NETWORKS,
+} from "../types";
 
 interface EditAddressDialogProps {
   open: boolean;
@@ -73,7 +77,7 @@ export function EditAddressDialog({
             <Select
               value={formData.chain}
               onValueChange={(value) =>
-                setFormData({ ...formData, chain: value })
+                setFormData({ ...formData, chain: value, network: "mainnet" })
               }
             >
               <SelectTrigger>
@@ -91,6 +95,28 @@ export function EditAddressDialog({
               </SelectContent>
             </Select>
           </div>
+          {formData.chain === "ethereum" && (
+            <div className="grid gap-2">
+              <Label htmlFor="edit-network">Ethereum Network</Label>
+              <Select
+                value={formData.network || "mainnet"}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, network: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {SUPPORTED_ETHEREUM_NETWORKS.map((net) => (
+                    <SelectItem key={net.value} value={net.value}>
+                      {net.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="grid gap-2">
             <Label htmlFor="edit-address">Address</Label>
             <Input
