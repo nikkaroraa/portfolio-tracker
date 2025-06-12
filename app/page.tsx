@@ -21,7 +21,7 @@ export default function Page() {
     {
       id: "2",
       label: "Ethereum Trading",
-      address: "0x742d35Cc6634C0532925a3b8D4C9db96590b5c8e",
+      address: "0x6180a84D611FA800d9E6C319ee87Ec561262E1b0",
       chain: "ethereum",
       balance: 2.3,
       lastUpdated: new Date(),
@@ -49,6 +49,7 @@ export default function Page() {
       address: data.address,
       chain: data.chain,
       lastUpdated: new Date(),
+      balance: data.chain === "ethereum" ? 0 : undefined,
     };
     setAddresses([...addresses, address]);
     setIsAddDialogOpen(false);
@@ -69,12 +70,19 @@ export default function Page() {
   const handleBalanceUpdate = (
     id: string,
     balance: number,
-    lastTransactions?: Address["lastTransactions"]
+    lastTransactions?: Address["lastTransactions"],
+    tokens?: Address["tokens"]
   ) => {
     setAddresses(
       addresses.map((addr) =>
         addr.id === id
-          ? { ...addr, balance, lastUpdated: new Date(), lastTransactions }
+          ? {
+              ...addr,
+              balance,
+              lastUpdated: new Date(),
+              lastTransactions,
+              tokens,
+            }
           : addr
       )
     );
