@@ -6,6 +6,20 @@ export interface TokenBalance {
   decimals: number;
 }
 
+export interface ChainData {
+  chain: string;
+  balance?: number;
+  lastUpdated?: Date;
+  tokens?: TokenBalance[];
+  lastTransactions?: Array<{
+    hash: string;
+    timestamp: number;
+    value: number;
+    type: "sent" | "received";
+    asset?: string;
+  }>;
+}
+
 export interface Address {
   id: string;
   label: string;
@@ -22,6 +36,8 @@ export interface Address {
     type: "sent" | "received";
     asset?: string;
   }>;
+  // New field for multi-chain data (only used for Ethereum addresses)
+  chainData?: ChainData[];
 }
 
 export interface TransactionVout {

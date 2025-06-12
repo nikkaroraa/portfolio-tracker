@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Network, Alchemy, AssetTransfersCategory } from "alchemy-sdk";
+import { ChainData } from "../types";
 
 const networkMap: Record<string, Network> = {
   ethereum: Network.ETH_MAINNET,
@@ -9,6 +10,8 @@ const networkMap: Record<string, Network> = {
   base: Network.BASE_MAINNET,
   // Starknet is not supported by Alchemy SDK as of now
 };
+
+const ETHEREUM_CHAINS = ["ethereum", "arbitrum", "polygon", "optimism", "base"];
 
 function getAlchemyInstance(chain: string) {
   const network = networkMap[chain] || Network.ETH_MAINNET;
@@ -116,9 +119,24 @@ async function fetchEthereumBalance(address: string, chain: string) {
       .sort((a, b) => parseInt(b.blockNum, 16) - parseInt(a.blockNum, 16))
       .slice(0, 5);
 
+    // Get block details for timestamps
+    const uniqueBlockNums = [...new Set(allTransfers.map(t => t.blockNum))];
+    const blockDetails = await Promise.all(
+      uniqueBlockNums.map(blockNum => 
+        alchemy.core.getBlock(parseInt(blockNum, 16))
+      )
+    );
+    
+    const blockTimestamps = new Map();
+    blockDetails.forEach(block => {
+      if (block) {
+        blockTimestamps.set(block.number, block.timestamp * 1000); // Convert to milliseconds
+      }
+    });
+
     const recentTransactions = allTransfers.map((transfer) => ({
       hash: transfer.hash,
-      timestamp: parseInt(transfer.blockNum, 16),
+      timestamp: blockTimestamps.get(parseInt(transfer.blockNum, 16)) || Date.now(),
       value: Number(transfer.value || 0),
       type: transfer.type,
       asset: transfer.asset || "ETH",
@@ -139,10 +157,45 @@ async function fetchEthereumBalance(address: string, chain: string) {
   }
 }
 
+async function fetchAllEthereumChains(address: string): Promise<ChainData[]> {
+  const chainPromises = ETHEREUM_CHAINS.map(async (chain) => {
+    try {
+      const data = await fetchEthereumBalance(address, chain);
+      return {
+        chain,
+        balance: data.balance,
+        tokens: data.tokens,
+        lastTransactions: data.lastTransactions,
+        lastUpdated: new Date(),
+      } as ChainData;
+    } catch (error) {
+      console.error(`Error fetching data for ${chain}:`, error);
+      return {
+        chain,
+        balance: 0,
+        tokens: [],
+        lastTransactions: [],
+        lastUpdated: new Date(),
+      } as ChainData;
+    }
+  });
+
+  return Promise.all(chainPromises);
+}
+
 export function useEthereumBalance(address: string, chain: string) {
   return useQuery({
     queryKey: ["ethereumBalance", address, chain],
     queryFn: () => fetchEthereumBalance(address, chain),
     enabled: Boolean(address && chain),
+  });
+}
+
+export function useAllEthereumChains(address: string) {
+  return useQuery({
+    queryKey: ["allEthereumChains", address],
+    queryFn: () => fetchAllEthereumChains(address),
+    enabled: Boolean(address),
+    staleTime: 30000, // 30 seconds
   });
 }
