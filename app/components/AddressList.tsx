@@ -17,6 +17,7 @@ interface AddressListProps {
     tokens?: Address["tokens"]
   ) => void;
   onChainDataUpdate: (id: string, chainData: ChainData[]) => void;
+  onReorder: (addresses: Address[]) => void;
 }
 
 export function AddressList({
@@ -26,6 +27,7 @@ export function AddressList({
   onAddClick,
   onBalanceUpdate,
   onChainDataUpdate,
+  onReorder,
 }: AddressListProps) {
   const [draggedItem, setDraggedItem] = React.useState<string | null>(null);
 
@@ -52,8 +54,7 @@ export function AddressList({
       const [draggedAddress] = newAddresses.splice(draggedIndex, 1);
       newAddresses.splice(targetIndex, 0, draggedAddress);
 
-      // Note: You'll need to implement a way to update the addresses in the parent component
-      // This could be through a callback prop like onAddressesReorder
+      onReorder(newAddresses);
     }
     setDraggedItem(null);
   };

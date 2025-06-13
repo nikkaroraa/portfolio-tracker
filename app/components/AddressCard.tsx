@@ -289,7 +289,7 @@ export function AddressCard({
           <div>
             <Label className="text-sm text-muted-foreground">Balance</Label>
             <p className="font-semibold text-lg">
-              {selectedChainData?.balance !== undefined
+              {selectedChainData?.balance !== undefined && selectedChainData.balance !== null
                 ? `${selectedChainData.balance.toLocaleString(undefined, {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 6,

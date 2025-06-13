@@ -3,38 +3,23 @@
 import * as React from "react";
 import { useState } from "react";
 import { Address, ChainData } from "./types";
+import { useAddresses } from "./hooks/useAddresses";
 import { Header } from "./components/Header";
 import { AddressList } from "./components/AddressList";
 import { AddAddressDialog } from "./components/AddAddressDialog";
 import { EditAddressDialog } from "./components/EditAddressDialog";
 
 export default function Page() {
-  const [addresses, setAddresses] = useState<Address[]>([
-    {
-      id: "1",
-      label: "Main Bitcoin Wallet",
-      address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
-      chain: "bitcoin",
-      balance: 0.5,
-      lastUpdated: new Date(),
-    },
-    {
-      id: "2",
-      label: "Ethereum Trading",
-      address: "0x6180a84D611FA800d9E6C319ee87Ec561262E1b0",
-      chain: "ethereum",
-      balance: 2.3,
-      lastUpdated: new Date(),
-    },
-    {
-      id: "3",
-      label: "Solana Wallet",
-      address: "97j6reChvtihmvVtbMjRBnAqt7g8QXo2hKdPwCPUyYFg",
-      chain: "solana",
-      balance: 0,
-      lastUpdated: new Date(),
-    },
-  ]);
+  const {
+    addresses,
+    loading,
+    error,
+    addAddress,
+    updateAddress,
+    deleteAddress,
+    updateAddressBalance,
+    reorderAddresses,
+  } = useAddresses();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -46,69 +31,88 @@ export default function Page() {
       ? addresses
       : addresses.filter((addr) => addr.chain === selectedChain);
 
-  const handleAddAddress = (data: {
+  const handleAddAddress = async (data: {
     label: string;
     address: string;
     chain: string;
   }) => {
-    const address: Address = {
-      id: Date.now().toString(),
-      label: data.label,
-      address: data.address,
-      chain: data.chain,
-      lastUpdated: new Date(),
-      balance: data.chain === "ethereum" ? 0 : undefined,
-    };
-    setAddresses([...addresses, address]);
-    setIsAddDialogOpen(false);
+    try {
+      await addAddress({
+        label: data.label,
+        address: data.address,
+        chain: data.chain,
+        lastUpdated: new Date(),
+        balance: data.chain === "ethereum" ? 0 : undefined,
+      });
+      setIsAddDialogOpen(false);
+    } catch (err) {
+      console.error('Failed to add address:', err);
+    }
   };
 
-  const handleEditAddress = (address: Address) => {
-    setAddresses(
-      addresses.map((addr) => (addr.id === address.id ? address : addr))
-    );
-    setEditingAddress(null);
-    setIsEditDialogOpen(false);
+  const handleEditAddress = async (address: Address) => {
+    try {
+      await updateAddress(address.id, {
+        label: address.label,
+        address: address.address,
+        chain: address.chain,
+        network: address.network,
+      });
+      setEditingAddress(null);
+      setIsEditDialogOpen(false);
+    } catch (err) {
+      console.error('Failed to update address:', err);
+    }
   };
 
-  const handleDeleteAddress = (id: string) => {
-    setAddresses(addresses.filter((addr) => addr.id !== id));
+  const handleDeleteAddress = async (id: string) => {
+    try {
+      await deleteAddress(id);
+    } catch (err) {
+      console.error('Failed to delete address:', err);
+    }
   };
 
-  const handleBalanceUpdate = (
+  const handleBalanceUpdate = async (
     id: string,
     balance: number,
     lastTransactions?: Address["lastTransactions"],
     tokens?: Address["tokens"]
   ) => {
-    setAddresses(
-      addresses.map((addr) =>
-        addr.id === id
-          ? {
-              ...addr,
-              balance,
-              lastUpdated: new Date(),
-              lastTransactions,
-              tokens,
-            }
-          : addr
-      )
-    );
+    try {
+      await updateAddressBalance(id, balance, tokens, lastTransactions);
+    } catch (err) {
+      console.error('Failed to update balance:', err);
+    }
   };
 
-  const handleChainDataUpdate = (id: string, chainData: ChainData[]) => {
-    setAddresses(
-      addresses.map((addr) =>
-        addr.id === id
-          ? {
-              ...addr,
-              chainData,
-              lastUpdated: new Date(),
-            }
-          : addr
-      )
-    );
+  const handleChainDataUpdate = async (id: string, chainData: ChainData[]) => {
+    try {
+      await updateAddressBalance(id, 0, undefined, undefined, chainData);
+    } catch (err) {
+      console.error('Failed to update chain data:', err);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-6 max-w-4xl">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-lg">Loading addresses...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-6 max-w-4xl">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-lg text-red-500">Error: {error}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
@@ -128,6 +132,7 @@ export default function Page() {
         onAddClick={() => setIsAddDialogOpen(true)}
         onBalanceUpdate={handleBalanceUpdate}
         onChainDataUpdate={handleChainDataUpdate}
+        onReorder={reorderAddresses}
       />
 
       <AddAddressDialog
