@@ -19,6 +19,7 @@ import {
 } from "../types";
 import { useBitcoinBalance } from "../hooks/useBitcoinBalance";
 import { useEthereumBalance, useAllEthereumChains } from "../hooks/useEthereumBalance";
+import { useSolanaBalance } from "../hooks/useSolanaBalance";
 
 function getChainInfo(chainValue: string): ChainInfo | undefined {
   return SUPPORTED_CHAINS.find((chain) => chain.value === chainValue);
@@ -32,6 +33,10 @@ function getChainSymbol(chainValue: string): string {
   // Default to ETH for Ethereum-based chains
   if (["ethereum", "arbitrum", "polygon", "optimism", "base"].includes(chainValue)) {
     return "ETH";
+  }
+  // Default to SOL for Solana
+  if (chainValue === "solana") {
+    return "SOL";
   }
   return "";
 }
@@ -66,6 +71,10 @@ function getExplorerUrl(chain: string, txHash: string): string {
       return `https://optimistic.etherscan.io/tx/${txHash}`;
     case "base":
       return `https://basescan.org/tx/${txHash}`;
+    case "solana":
+      return `https://solscan.io/tx/${txHash}`;
+    case "bitcoin":
+      return `https://mempool.space/tx/${txHash}`;
     default:
       return "#";
   }
@@ -108,11 +117,16 @@ export function AddressCard({
   );
   const chainInfo = getChainInfo(address.chain);
   const { refetch: refetchBitcoinBalance, isFetching: isFetchingBitcoin } =
-    useBitcoinBalance(address.address);
+    useBitcoinBalance(address.chain === "bitcoin" ? address.address : "");
   const { refetch: refetchEthereumBalance, isFetching: isFetchingEthereum } =
-    useEthereumBalance(address.address, address.chain);
+    useEthereumBalance(
+      ["arbitrum", "polygon", "optimism", "base"].includes(address.chain) ? address.address : "",
+      address.chain
+    );
   const { refetch: refetchAllChains, isFetching: isFetchingAllChains } =
     useAllEthereumChains(address.chain === "ethereum" ? address.address : "");
+  const { refetch: refetchSolanaBalance, isFetching: isFetchingSolana } =
+    useSolanaBalance(address.chain === "solana" ? address.address : "");
 
   const handleRefresh = async () => {
     try {
@@ -126,6 +140,16 @@ export function AddressCard({
         const { data } = await refetchAllChains();
         if (data) {
           onChainDataUpdate(address.id, data);
+        }
+      } else if (address.chain === "solana") {
+        const { data } = await refetchSolanaBalance();
+        if (data) {
+          onBalanceUpdate(
+            address.id,
+            data.balance,
+            data.lastTransactions,
+            data.tokens
+          );
         }
       } else if (
         ["arbitrum", "polygon", "optimism", "base"].includes(address.chain)
@@ -145,7 +169,7 @@ export function AddressCard({
     }
   };
 
-  const isFetching = isFetchingBitcoin || isFetchingEthereum || isFetchingAllChains;
+  const isFetching = isFetchingBitcoin || isFetchingEthereum || isFetchingAllChains || isFetchingSolana;
 
   // Get data for the selected chain
   const getSelectedChainData = () => {
@@ -201,7 +225,7 @@ export function AddressCard({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {(address.chain === "bitcoin" || address.chain === "ethereum") && (
+            {(address.chain === "bitcoin" || address.chain === "ethereum" || address.chain === "solana") && (
               <Button
                 variant="ghost"
                 size="icon"
