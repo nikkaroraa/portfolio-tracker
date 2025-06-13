@@ -26,6 +26,14 @@ export default function Page() {
       balance: 2.3,
       lastUpdated: new Date(),
     },
+    {
+      id: "3",
+      label: "Solana Wallet",
+      address: "A1LGBne5BKuwxNTpWsqkVTVeLmjGoajj8YvcAGkLfayt",
+      chain: "solana",
+      balance: 0,
+      lastUpdated: new Date(),
+    },
   ]);
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
