@@ -82,3 +82,24 @@ export const SUPPORTED_ETHEREUM_NETWORKS = [
   { value: "optimism", label: "Optimism" },
   { value: "base", label: "Base" },
 ];
+
+export const SUPPORTED_TOKENS = [
+  "WETH",
+  "WSTETH",
+  "stETH",
+  "USDC",
+  "USDT",
+  "EUL",
+  "PENDLE",
+  "INST",
+  "WBTC",
+  "DAI",
+  "LINK",
+  "UNI",
+  "AAVE",
+  "CRV",
+  "COMP",
+  "MKR",
+  "SNX",
+  "1INCH",
+];

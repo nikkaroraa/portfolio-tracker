@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Network, Alchemy, AssetTransfersCategory } from "alchemy-sdk";
-import { ChainData } from "../types";
+import { ChainData, SUPPORTED_TOKENS } from "../types";
 
 const networkMap: Record<string, Network> = {
   ethereum: Network.ETH_MAINNET,
@@ -144,11 +144,14 @@ async function fetchEthereumBalance(address: string, chain: string) {
       to: transfer.to || normalizedAddress,
     }));
 
+    const filteredTokens = tokenMetadata
+      .filter((token): token is TokenBalance => token !== null)
+      .filter((token) => SUPPORTED_TOKENS.includes(token.symbol))
+      .filter((token) => Number(token.balance) > 0);
+
     return {
       balance: formattedEthBalance,
-      tokens: tokenMetadata.filter(
-        (token): token is TokenBalance => token !== null
-      ),
+      tokens: filteredTokens,
       lastTransactions: recentTransactions,
     };
   } catch (error) {
