@@ -120,3 +120,15 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Disable color transitions only for theme changes */
+.theme-transitioning * {
+  transition: none !important;
+}
+
+/* Re-enable specific transitions we want to keep */
+.theme-transitioning *:hover,
+.theme-transitioning *:focus,
+.theme-transitioning *[data-state] {
+  transition: transform 0.15s, opacity 0.15s !important;
+}

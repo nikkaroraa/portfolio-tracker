@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SUPPORTED_CHAINS } from "../types";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface HeaderProps {
   onAddClick: () => void;
@@ -49,6 +50,7 @@ export function Header({
             ))}
           </SelectContent>
         </Select>
+        <ThemeToggle />
         <Button onClick={onAddClick}>
           <Plus className="h-4 w-4 mr-2" />
           Add Address
