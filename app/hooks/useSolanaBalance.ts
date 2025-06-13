@@ -2,6 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { SUPPORTED_SPL_TOKENS } from "../types";
 import bs58 from "bs58";
 
 function getSolanaConnection() {
@@ -58,12 +60,8 @@ function normalizeSOLAddress(address: string): PublicKey {
 }
 
 async function fetchSolanaBalance(address: string) {
-  console.log("Fetching Solana balance for address:", address);
-  
   try {
     const publicKey = normalizeSOLAddress(address);
-    console.log("Created PublicKey successfully:", publicKey.toBase58());
-    
     const connection = getSolanaConnection();
 
     // Get SOL balance
@@ -71,105 +69,123 @@ async function fetchSolanaBalance(address: string) {
     const solBalance = balance / LAMPORTS_PER_SOL;
     const formattedSolBalance = Number(solBalance.toFixed(6));
 
-    // Skip token accounts for now due to PublicKey constructor issues
+    // Get SPL token balances
     const tokenBalances: SolanaTokenBalance[] = [];
-    console.log("Skipping token accounts due to library compatibility issues");
+    
+    try {
+      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
+        programId: TOKEN_PROGRAM_ID,
+      });
 
-    // Get recent signatures/transactions
-    console.log("Fetching transaction signatures for:", publicKey.toBase58());
-    const signatures = await connection.getSignaturesForAddress(publicKey, {
-      limit: 10,
-    });
+      for (const account of tokenAccounts.value) {
+        try {
+          const tokenInfo = account.account.data.parsed.info;
+          const tokenAmount = Number(tokenInfo.tokenAmount.amount);
+          const decimals = tokenInfo.tokenAmount.decimals;
+          const mintAddress = tokenInfo.mint;
+          
+          console.log("Processing token:", {
+            mint: mintAddress,
+            amount: tokenAmount,
+            isSupported: !!SUPPORTED_SPL_TOKENS[mintAddress],
+            hasBalance: tokenAmount > 0
+          });
+          
+          // Only include tokens with non-zero balances and supported tokens
+          if (tokenAmount > 0 && SUPPORTED_SPL_TOKENS[mintAddress]) {
+            const tokenData = SUPPORTED_SPL_TOKENS[mintAddress];
+            const formattedBalance = tokenAmount / Math.pow(10, decimals);
+            
+            console.log("Adding supported token:", tokenData.symbol, formattedBalance);
+            
+            tokenBalances.push({
+              contractAddress: mintAddress,
+              symbol: tokenData.symbol,
+              name: tokenData.name,
+              balance: formattedBalance.toString(),
+              decimals,
+            });
+          } else if (tokenAmount > 0) {
+            console.log("Token not in supported list:", mintAddress);
+          }
+        } catch (error) {
+          console.warn("Failed to process SPL token account:", account.pubkey, error);
+        }
+      }
+      
+      console.log("Final filtered tokens:", tokenBalances);
+    } catch (error) {
+      console.warn("Failed to fetch SPL token accounts:", error);
+    }
 
-    console.log("Found", signatures.length, "signatures");
-
-    // Process transactions to get transaction details
+    // Get recent transaction history
     const recentTransactions: SolanaTransaction[] = [];
     
-    for (const sig of signatures.slice(0, 5)) {
-      try {
-        console.log("Processing signature:", sig.signature);
-        
-        const transaction = await connection.getTransaction(sig.signature, {
-          commitment: "confirmed",
-          maxSupportedTransactionVersion: 0,
-        });
-        
-        if (transaction && transaction.meta && !transaction.meta.err) {
-          console.log("Transaction found, processing...");
-          const preBalances = transaction.meta.preBalances;
-          const postBalances = transaction.meta.postBalances;
+    try {
+      const signatures = await connection.getSignaturesForAddress(publicKey, {
+        limit: 10,
+      });
+
+      for (const sig of signatures.slice(0, 5)) {
+        try {
+          const transaction = await connection.getTransaction(sig.signature, {
+            commitment: "confirmed",
+            maxSupportedTransactionVersion: 0,
+          });
           
-          // Handle both legacy and versioned transactions
-          let accountKeys;
-          if (transaction.transaction.message.accountKeys) {
-            // Legacy transaction
-            accountKeys = transaction.transaction.message.accountKeys;
-          } else if (transaction.transaction.message.staticAccountKeys) {
-            // Versioned transaction
-            accountKeys = transaction.transaction.message.staticAccountKeys;
-          } else {
-            console.warn("Could not find account keys in transaction");
-            continue;
-          }
-          
-          console.log("Account keys found:", accountKeys.length);
-          
-          // Find our address in the account keys
-          const addressIndex = accountKeys.findIndex(key => key.toBase58() === publicKey.toBase58());
-          console.log("Address index:", addressIndex);
-          
-          if (addressIndex !== -1) {
-            const preBalance = preBalances[addressIndex] || 0;
-            const postBalance = postBalances[addressIndex] || 0;
-            const balanceChange = (postBalance - preBalance) / LAMPORTS_PER_SOL;
+          if (transaction && transaction.meta && !transaction.meta.err) {
+            const preBalances = transaction.meta.preBalances;
+            const postBalances = transaction.meta.postBalances;
             
-            console.log("Balance change:", {
-              preBalance,
-              postBalance, 
-              balanceChange,
-              timestamp: sig.blockTime
-            });
+            // Handle both legacy and versioned transactions
+            let accountKeys;
+            const message = transaction.transaction.message;
             
-            // Calculate the actual transaction value
-            // For Solana, balance change includes fees, so let's try to get a better estimate
-            let transactionValue = Math.abs(balanceChange);
-            let transactionType: "sent" | "received" = balanceChange > 0 ? "received" : "sent";
-            
-            // If balance change is very small, it might just be fees
-            // In that case, try to extract value from transaction fee
-            if (Math.abs(balanceChange) < 0.001) {
-              const fee = transaction.meta.fee ? transaction.meta.fee / LAMPORTS_PER_SOL : 0;
-              transactionValue = fee > 0 ? fee : 0.000005; // Default small fee amount
-              transactionType = "sent"; // Fees are always outgoing
-            }
-            
-            console.log("Final transaction value:", transactionValue, "type:", transactionType);
-            
-            // Only include transactions with meaningful amounts or fees
-            if (transactionValue > 0.000001) {
-              recentTransactions.push({
-                hash: sig.signature,
-                timestamp: (sig.blockTime || Date.now() / 1000) * 1000, // Convert to milliseconds
-                value: transactionValue,
-                type: transactionType,
-                asset: "SOL",
-              });
+            if ('accountKeys' in message) {
+              // Legacy transaction
+              accountKeys = message.accountKeys;
             } else {
-              console.log("Transaction value too small, skipping");
+              // Versioned transaction - get account keys from meta
+              accountKeys = transaction.meta.loadedAddresses ? 
+                [...transaction.transaction.message.staticAccountKeys, ...transaction.meta.loadedAddresses.writable, ...transaction.meta.loadedAddresses.readonly] :
+                transaction.transaction.message.staticAccountKeys;
             }
-          } else {
-            console.log("Address not found in account keys");
+            
+            const addressIndex = accountKeys.findIndex(key => key.toBase58() === publicKey.toBase58());
+            
+            if (addressIndex !== -1) {
+              const preBalance = preBalances[addressIndex] || 0;
+              const postBalance = postBalances[addressIndex] || 0;
+              const balanceChange = (postBalance - preBalance) / LAMPORTS_PER_SOL;
+              
+              let transactionValue = Math.abs(balanceChange);
+              let transactionType: "sent" | "received" = balanceChange > 0 ? "received" : "sent";
+              
+              // Handle small balance changes (likely fees)
+              if (Math.abs(balanceChange) < 0.001) {
+                const fee = transaction.meta.fee ? transaction.meta.fee / LAMPORTS_PER_SOL : 0;
+                transactionValue = fee > 0 ? fee : 0.000005;
+                transactionType = "sent";
+              }
+              
+              if (transactionValue > 0.000001) {
+                recentTransactions.push({
+                  hash: sig.signature,
+                  timestamp: (sig.blockTime || Date.now() / 1000) * 1000,
+                  value: transactionValue,
+                  type: transactionType,
+                  asset: "SOL",
+                });
+              }
+            }
           }
-        } else {
-          console.log("Transaction not found or has error");
+        } catch (error) {
+          console.warn("Failed to fetch transaction details for signature:", sig.signature, error);
         }
-      } catch (error) {
-        console.warn("Failed to fetch transaction details for signature:", sig.signature, error);
       }
+    } catch (error) {
+      console.warn("Failed to fetch transaction signatures:", error);
     }
-    
-    console.log("Final recent transactions:", recentTransactions);
 
     return {
       balance: formattedSolBalance,
@@ -178,11 +194,6 @@ async function fetchSolanaBalance(address: string) {
     };
   } catch (error) {
     console.error("Error fetching Solana balance:", error);
-    console.error("Error details:", {
-      message: error instanceof Error ? error.message : "Unknown error",
-      address: address,
-      stack: error instanceof Error ? error.stack : undefined
-    });
     throw error;
   }
 }

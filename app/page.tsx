@@ -29,7 +29,7 @@ export default function Page() {
     {
       id: "3",
       label: "Solana Wallet",
-      address: "A1LGBne5BKuwxNTpWsqkVTVeLmjGoajj8YvcAGkLfayt",
+      address: "97j6reChvtihmvVtbMjRBnAqt7g8QXo2hKdPwCPUyYFg",
       chain: "solana",
       balance: 0,
       lastUpdated: new Date(),
