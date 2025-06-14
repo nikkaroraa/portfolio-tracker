@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { Address } from '../types'
+import { Address, Tag, TokenBalance, ChainData } from '../types'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -12,11 +12,13 @@ export interface DatabaseAddress {
   address: string
   chain: string
   network?: string
+  description?: string
+  tags?: Tag[]
   balance?: number
   last_updated?: string
-  tokens?: any
-  last_transactions?: any
-  chain_data?: any
+  tokens?: TokenBalance[]
+  last_transactions?: Address['lastTransactions']
+  chain_data?: ChainData[]
   created_at: string
   updated_at: string
 }
@@ -28,6 +30,8 @@ export function convertFromDatabase(dbAddress: DatabaseAddress): Address {
     address: dbAddress.address,
     chain: dbAddress.chain,
     network: dbAddress.network,
+    description: dbAddress.description,
+    tags: dbAddress.tags || [],
     balance: dbAddress.balance,
     lastUpdated: dbAddress.last_updated ? new Date(dbAddress.last_updated) : undefined,
     tokens: dbAddress.tokens,
@@ -42,6 +46,8 @@ export function convertToDatabase(address: Omit<Address, 'id'>): Omit<DatabaseAd
     address: address.address,
     chain: address.chain,
     network: address.network,
+    description: address.description,
+    tags: address.tags || [],
     balance: address.balance,
     last_updated: address.lastUpdated?.toISOString(),
     tokens: address.tokens,

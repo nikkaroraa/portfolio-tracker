@@ -104,14 +104,14 @@ export function useAddresses() {
   const updateAddressBalance = async (
     id: string, 
     balance: number, 
-    tokens?: any[], 
-    lastTransactions?: any[], 
-    chainData?: any[]
+    tokens?: Address['tokens'], 
+    lastTransactions?: Address['lastTransactions'], 
+    chainData?: Address['chainData']
   ) => {
     try {
       setError(null)
       
-      const updates: any = {
+      const updates: Partial<DatabaseAddress> = {
         balance,
         last_updated: new Date().toISOString(),
       }

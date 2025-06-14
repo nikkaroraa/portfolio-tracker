@@ -20,12 +20,21 @@ export interface ChainData {
   }>;
 }
 
+export interface Tag {
+  id: string;
+  name: string;
+  color: string;
+  createdAt: Date;
+}
+
 export interface Address {
   id: string;
   label: string;
   address: string;
   chain: string;
   network?: string;
+  description?: string;
+  tags?: Tag[];
   balance?: number;
   lastUpdated?: Date;
   tokens?: TokenBalance[];

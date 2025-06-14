@@ -2,6 +2,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -17,7 +18,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { SUPPORTED_CHAINS } from "../types";
+import { SUPPORTED_CHAINS, Tag } from "../types";
+import { TagSelector } from "./TagSelector";
 
 interface AddAddressDialogProps {
   open: boolean;
@@ -27,6 +29,8 @@ interface AddAddressDialogProps {
     address: string;
     chain: string;
     network: string;
+    description?: string;
+    tags?: Tag[];
   }) => void;
 }
 
@@ -40,12 +44,19 @@ export function AddAddressDialog({
     address: "",
     chain: "",
     network: "mainnet",
+    description: "",
   });
+  const [selectedTags, setSelectedTags] = React.useState<Tag[]>([]);
 
   const handleSubmit = () => {
     if (formData.label && formData.address && formData.chain) {
-      onSubmit(formData);
-      setFormData({ label: "", address: "", chain: "", network: "mainnet" });
+      onSubmit({
+        ...formData,
+        description: formData.description || undefined,
+        tags: selectedTags.length > 0 ? selectedTags : undefined,
+      });
+      setFormData({ label: "", address: "", chain: "", network: "mainnet", description: "" });
+      setSelectedTags([]);
     }
   };
 
@@ -111,6 +122,22 @@ export function AddAddressDialog({
               }
             />
           </div>
+          <div className="grid gap-2">
+            <Label htmlFor="description">Description (Optional)</Label>
+            <Textarea
+              id="description"
+              placeholder="e.g., Main trading wallet, DeFi interactions, cold storage..."
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              rows={3}
+            />
+          </div>
+          <TagSelector
+            selectedTags={selectedTags}
+            onTagsChange={setSelectedTags}
+          />
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>

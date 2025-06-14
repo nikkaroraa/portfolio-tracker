@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useState } from "react";
-import { Address, ChainData } from "./types";
+import { Address, ChainData, Tag } from "./types";
 import { useAddresses } from "./hooks/useAddresses";
 import { Header } from "./components/Header";
 import { AddressList } from "./components/AddressList";
@@ -35,12 +35,18 @@ export default function Page() {
     label: string;
     address: string;
     chain: string;
+    network: string;
+    description?: string;
+    tags?: Tag[];
   }) => {
     try {
       await addAddress({
         label: data.label,
         address: data.address,
         chain: data.chain,
+        network: data.network,
+        description: data.description,
+        tags: data.tags,
         lastUpdated: new Date(),
         balance: data.chain === "ethereum" ? 0 : undefined,
       });
@@ -57,6 +63,8 @@ export default function Page() {
         address: address.address,
         chain: address.chain,
         network: address.network,
+        description: address.description,
+        tags: address.tags,
       });
       setEditingAddress(null);
       setIsEditDialogOpen(false);

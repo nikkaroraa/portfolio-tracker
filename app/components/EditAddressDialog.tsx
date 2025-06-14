@@ -2,6 +2,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -20,7 +21,9 @@ import {
 import {
   Address,
   SUPPORTED_CHAINS,
+  Tag,
 } from "../types";
+import { TagSelector } from "./TagSelector";
 
 interface EditAddressDialogProps {
   open: boolean;
@@ -36,16 +39,21 @@ export function EditAddressDialog({
   onSubmit,
 }: EditAddressDialogProps) {
   const [formData, setFormData] = React.useState<Address | null>(null);
+  const [selectedTags, setSelectedTags] = React.useState<Tag[]>([]);
 
   React.useEffect(() => {
     if (address) {
       setFormData(address);
+      setSelectedTags(address.tags || []);
     }
   }, [address]);
 
   const handleSubmit = () => {
     if (formData) {
-      onSubmit(formData);
+      onSubmit({
+        ...formData,
+        tags: selectedTags,
+      });
     }
   };
 
@@ -111,6 +119,22 @@ export function EditAddressDialog({
               }
             />
           </div>
+          <div className="grid gap-2">
+            <Label htmlFor="edit-description">Description (Optional)</Label>
+            <Textarea
+              id="edit-description"
+              placeholder="e.g., Main trading wallet, DeFi interactions, cold storage..."
+              value={formData.description || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              rows={3}
+            />
+          </div>
+          <TagSelector
+            selectedTags={selectedTags}
+            onTagsChange={setSelectedTags}
+          />
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>

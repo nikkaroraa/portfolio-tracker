@@ -260,6 +260,30 @@ export function AddressCard({
             </p>
           </div>
 
+          {/* Description */}
+          {address.description && (
+            <div>
+              <Label className="text-sm text-muted-foreground">Description</Label>
+              <p className="text-sm text-muted-foreground bg-muted p-2 rounded">
+                {address.description}
+              </p>
+            </div>
+          )}
+
+          {/* Tags */}
+          {address.tags && address.tags.length > 0 && (
+            <div>
+              <Label className="text-sm text-muted-foreground">Tags</Label>
+              <div className="flex flex-wrap gap-2 mt-1">
+                {address.tags.map((tag) => (
+                  <Badge key={tag.id} variant="outline" style={{ backgroundColor: tag.color + '20', borderColor: tag.color }}>
+                    {tag.name}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Chain Selector for Ethereum addresses */}
           {address.chain === "ethereum" && address.chainData && address.chainData.length > 0 && (
             <div>
