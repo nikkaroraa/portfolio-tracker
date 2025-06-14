@@ -81,7 +81,6 @@ export const SUPPORTED_CHAINS: ChainInfo[] = [
   { value: "bitcoin", label: "Bitcoin", symbol: "BTC", color: "bg-orange-500" },
   { value: "ethereum", label: "Ethereum", symbol: "ETH", color: "bg-blue-500" },
   { value: "solana", label: "Solana", symbol: "SOL", color: "bg-purple-500" },
-  { value: "zcash", label: "Zcash", symbol: "ZEC", color: "bg-yellow-500" },
 ];
 
 export const SUPPORTED_ETHEREUM_NETWORKS = [
