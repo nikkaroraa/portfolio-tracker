@@ -29,7 +29,7 @@ export function ThemeToggle() {
 
   return (
     <Select value={theme} onValueChange={handleThemeChange}>
-      <SelectTrigger className="w-9 h-9 p-0 border-0 bg-transparent hover:bg-accent">
+      <SelectTrigger className="w-[60px] h-10 px-3 py-2 gap-2">
         {getIcon()}
       </SelectTrigger>
       <SelectContent align="end">

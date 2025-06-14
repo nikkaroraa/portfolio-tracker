@@ -110,6 +110,7 @@ export function AddressCard({
   onChainDataUpdate,
 }: AddressCardProps) {
   const [isTokensExpanded, setIsTokensExpanded] = useState(false);
+  const [isTransactionsExpanded, setIsTransactionsExpanded] = useState(false);
   const [selectedChain, setSelectedChain] = useState(
     address.chain === "ethereum" && address.chainData && address.chainData.length > 0
       ? address.chainData[0].chain
@@ -201,7 +202,7 @@ export function AddressCard({
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
+            <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab hover:cursor-grabbing" />
             <div className="flex flex-col gap-0.5">
               <div className="flex items-center gap-2">
                 {chainInfo && (
@@ -231,19 +232,21 @@ export function AddressCard({
                 size="icon"
                 onClick={handleRefresh}
                 disabled={isFetching}
+                className="cursor-pointer disabled:cursor-not-allowed"
               >
                 <RefreshCw
                   className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
                 />
               </Button>
             )}
-            <Button variant="ghost" size="icon" onClick={() => onEdit(address)}>
+            <Button variant="ghost" size="icon" onClick={() => onEdit(address)} className="cursor-pointer">
               <Edit2 className="h-4 w-4" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => onDelete(address.id)}
+              className="cursor-pointer"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -328,7 +331,7 @@ export function AddressCard({
               <Button
                 variant="ghost"
                 onClick={() => setIsTokensExpanded(!isTokensExpanded)}
-                className="flex items-center gap-2 p-0 h-auto text-sm text-muted-foreground hover:text-foreground mb-3"
+                className="flex items-center gap-2 p-0 h-auto text-sm text-muted-foreground hover:text-foreground mb-3 cursor-pointer"
               >
                 {isTokensExpanded ? (
                   <ChevronDown className="h-4 w-4" />
@@ -361,69 +364,80 @@ export function AddressCard({
           {/* Recent Transactions */}
           {selectedChainData?.lastTransactions && selectedChainData.lastTransactions.length > 0 && (
             <div>
-              <Label className="text-sm text-muted-foreground mb-3 block">
-                Recent Transactions
-              </Label>
-              <div className="overflow-x-auto rounded border bg-white dark:bg-card">
-                <table className="min-w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-muted/30">
-                      <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                        Date
-                      </th>
-                      <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                        Type
-                      </th>
-                      <th className="px-4 py-3 text-right font-medium text-muted-foreground">
-                        Amount
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedChainData.lastTransactions.slice(0, 5).map((tx) => {
-                      const isReceived = tx.type === "received";
-                      // Bitcoin timestamps are in seconds, Ethereum timestamps are already in milliseconds
-                      const timestampMs = selectedChain === "bitcoin" ? tx.timestamp * 1000 : tx.timestamp;
-                      return (
-                        <tr
-                          key={tx.hash}
-                          className="border-b last:border-0 hover:bg-muted/20"
-                        >
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <a
-                              href={getExplorerUrl(selectedChain, tx.hash)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
-                            >
-                              {formatDate(new Date(timestampMs))}
-                            </a>
-                          </td>
-                          <td className="px-4 py-3">
-                            <span
-                              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
-                                isReceived
-                                  ? "bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800"
-                                  : "bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800"
-                              }`}
-                            >
-                              {isReceived ? "↓ Received" : "↑ Sent"}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 font-mono text-right">
-                            <span className={isReceived ? "text-green-600" : "text-red-600"}>
-                              {isReceived ? "+" : "-"}{tx.value.toLocaleString(undefined, {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 6,
-                              })} {tx.asset || getChainSymbol(selectedChain)}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <Button
+                variant="ghost"
+                onClick={() => setIsTransactionsExpanded(!isTransactionsExpanded)}
+                className="flex items-center gap-2 p-0 h-auto text-sm text-muted-foreground hover:text-foreground mb-3 cursor-pointer"
+              >
+                {isTransactionsExpanded ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+                Recent Transactions ({selectedChainData.lastTransactions.length})
+              </Button>
+              {isTransactionsExpanded && (
+                <div className="overflow-x-auto rounded border bg-white dark:bg-card">
+                  <table className="min-w-full text-sm">
+                    <thead>
+                      <tr className="border-b bg-muted/30">
+                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                          Date
+                        </th>
+                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                          Type
+                        </th>
+                        <th className="px-4 py-3 text-right font-medium text-muted-foreground">
+                          Amount
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedChainData.lastTransactions.slice(0, 5).map((tx) => {
+                        const isReceived = tx.type === "received";
+                        // Bitcoin timestamps are in seconds, Ethereum timestamps are already in milliseconds
+                        const timestampMs = selectedChain === "bitcoin" ? tx.timestamp * 1000 : tx.timestamp;
+                        return (
+                          <tr
+                            key={tx.hash}
+                            className="border-b last:border-0 hover:bg-muted/20"
+                          >
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <a
+                                href={getExplorerUrl(selectedChain, tx.hash)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline cursor-pointer"
+                              >
+                                {formatDate(new Date(timestampMs))}
+                              </a>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span
+                                className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
+                                  isReceived
+                                    ? "bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800"
+                                    : "bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800"
+                                }`}
+                              >
+                                {isReceived ? "↓ Received" : "↑ Sent"}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 font-mono text-right">
+                              <span className={isReceived ? "text-green-600" : "text-red-600"}>
+                                {isReceived ? "+" : "-"}{tx.value.toLocaleString(undefined, {
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 6,
+                                })} {tx.asset || getChainSymbol(selectedChain)}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           )}
         </div>
