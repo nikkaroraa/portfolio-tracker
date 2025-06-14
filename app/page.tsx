@@ -8,8 +8,12 @@ import { Header } from "./components/Header";
 import { AddressList } from "./components/AddressList";
 import { AddAddressDialog } from "./components/AddAddressDialog";
 import { EditAddressDialog } from "./components/EditAddressDialog";
+import { PasswordGate } from "./components/PasswordGate";
+import { LoadingScreen } from "./components/LoadingScreen";
 
 export default function Page() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
   const {
     addresses,
     loading,
@@ -102,14 +106,12 @@ export default function Page() {
     }
   };
 
+  if (!isAuthenticated) {
+    return <PasswordGate onAuthenticated={() => setIsAuthenticated(true)} />;
+  }
+
   if (loading) {
-    return (
-      <div className="container mx-auto p-6 max-w-4xl">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-lg">Loading addresses...</div>
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (error) {

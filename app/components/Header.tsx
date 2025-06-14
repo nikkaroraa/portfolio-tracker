@@ -33,10 +33,10 @@ export function Header({
       <div className="text-center">
         <h1 className="text-4xl font-bold flex items-center justify-center gap-3 mb-3">
           <Wallet className="h-10 w-10" />
-          Crypto Address Tracker
+          Portfolio Tracker
         </h1>
         <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-          Track your cryptocurrency addresses across multiple blockchains
+          Multi-chain portfolio tracking + Secure access
         </p>
       </div>
 

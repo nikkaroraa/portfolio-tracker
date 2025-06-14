@@ -14,9 +14,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Crypto Address Tracker",
-  description:
-    "Track your cryptocurrency addresses across multiple blockchains",
+  title: "Portfolio Tracker",
+  description: "Multi-chain portfolio tracking + Secure access",
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
 };
 
 export default function RootLayout({
