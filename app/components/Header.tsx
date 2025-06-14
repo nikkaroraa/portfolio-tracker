@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Wallet } from "lucide-react";
+import { Plus, Wallet, RefreshCw } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -15,12 +15,16 @@ interface HeaderProps {
   onAddClick: () => void;
   selectedChain: string;
   onChainChange: (chain: string) => void;
+  onRefreshAll: () => void;
+  isRefreshing: boolean;
 }
 
 export function Header({
   onAddClick,
   selectedChain,
   onChainChange,
+  onRefreshAll,
+  isRefreshing,
 }: HeaderProps) {
   return (
     <div className="mb-8 space-y-6">
@@ -65,11 +69,24 @@ export function Header({
           </Select>
         </div>
 
-        {/* Action Button */}
-        <Button onClick={onAddClick} size="lg" className="cursor-pointer">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Address
-        </Button>
+        {/* Action Buttons */}
+        <div className="flex items-center gap-3">
+          <Button 
+            onClick={onRefreshAll} 
+            size="lg" 
+            variant="outline"
+            className="cursor-pointer"
+            disabled={isRefreshing}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {isRefreshing ? 'Refreshing...' : 'Refresh All'}
+          </Button>
+          
+          <Button onClick={onAddClick} size="lg" className="cursor-pointer">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Address
+          </Button>
+        </div>
       </div>
     </div>
   );

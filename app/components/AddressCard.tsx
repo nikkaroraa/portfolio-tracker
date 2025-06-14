@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Trash2, Edit2, GripVertical, RefreshCw, ChevronDown, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Address,
   ChainInfo,
@@ -129,7 +129,7 @@ export function AddressCard({
   const { refetch: refetchSolanaBalance, isFetching: isFetchingSolana } =
     useSolanaBalance(address.chain === "solana" ? address.address : "");
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     try {
       if (address.chain === "bitcoin") {
         const { data } = await refetchBitcoinBalance();
@@ -168,9 +168,31 @@ export function AddressCard({
     } catch (error) {
       console.error("Failed to refresh balance:", error);
     }
-  };
+  }, [
+    address.chain,
+    address.id,
+    refetchBitcoinBalance,
+    refetchAllChains,
+    refetchSolanaBalance,
+    refetchEthereumBalance,
+    onBalanceUpdate,
+    onChainDataUpdate
+  ]);
 
   const isFetching = isFetchingBitcoin || isFetchingEthereum || isFetchingAllChains || isFetchingSolana;
+
+  // Listen for refresh all event
+  useEffect(() => {
+    const handleRefreshAllEvent = () => {
+      handleRefresh();
+    };
+
+    window.addEventListener('refreshAllAddresses', handleRefreshAllEvent);
+    
+    return () => {
+      window.removeEventListener('refreshAllAddresses', handleRefreshAllEvent);
+    };
+  }, [handleRefresh]);
 
   // Get data for the selected chain
   const getSelectedChainData = () => {
@@ -393,13 +415,13 @@ export function AddressCard({
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedChainData.lastTransactions.slice(0, 5).map((tx) => {
+                      {selectedChainData.lastTransactions.slice(0, 5).map((tx, index) => {
                         const isReceived = tx.type === "received";
                         // Bitcoin timestamps are in seconds, Ethereum timestamps are already in milliseconds
                         const timestampMs = selectedChain === "bitcoin" ? tx.timestamp * 1000 : tx.timestamp;
                         return (
                           <tr
-                            key={tx.hash}
+                            key={`${tx.hash}-${index}`}
                             className="border-b last:border-0 hover:bg-muted/20"
                           >
                             <td className="px-4 py-3 whitespace-nowrap">

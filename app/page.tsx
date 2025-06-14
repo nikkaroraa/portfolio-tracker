@@ -29,6 +29,7 @@ export default function Page() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [selectedChain, setSelectedChain] = useState("all");
+  const [isRefreshingAll, setIsRefreshingAll] = useState(false);
 
   const filteredAddresses =
     selectedChain === "all"
@@ -106,6 +107,20 @@ export default function Page() {
     }
   };
 
+  const handleRefreshAll = async () => {
+    setIsRefreshingAll(true);
+    
+    // Dispatch a custom event that AddressCard components can listen to
+    const refreshEvent = new CustomEvent('refreshAllAddresses');
+    window.dispatchEvent(refreshEvent);
+    
+    // Wait a bit for all the refreshes to complete
+    // This is a simple approach - in a real app you might want more sophisticated coordination
+    setTimeout(() => {
+      setIsRefreshingAll(false);
+    }, 3000);
+  };
+
   if (!isAuthenticated) {
     return <PasswordGate onAuthenticated={() => setIsAuthenticated(true)} />;
   }
@@ -130,6 +145,8 @@ export default function Page() {
         onAddClick={() => setIsAddDialogOpen(true)}
         selectedChain={selectedChain}
         onChainChange={setSelectedChain}
+        onRefreshAll={handleRefreshAll}
+        isRefreshing={isRefreshingAll}
       />
 
       <AddressList
