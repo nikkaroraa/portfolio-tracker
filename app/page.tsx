@@ -29,12 +29,19 @@ export default function Page() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [selectedChain, setSelectedChain] = useState("all");
+  const [selectedTag, setSelectedTag] = useState("all");
   const [isRefreshingAll, setIsRefreshingAll] = useState(false);
 
-  const filteredAddresses =
-    selectedChain === "all"
-      ? addresses
-      : addresses.filter((addr) => addr.chain === selectedChain);
+  const filteredAddresses = addresses.filter((addr) => {
+    // Filter by chain
+    const chainMatch = selectedChain === "all" || addr.chain === selectedChain;
+    
+    // Filter by tag
+    const tagMatch = selectedTag === "all" || 
+      (addr.tags && addr.tags.some(tag => tag.id === selectedTag));
+    
+    return chainMatch && tagMatch;
+  });
 
   const handleAddAddress = async (data: {
     label: string;
@@ -145,6 +152,8 @@ export default function Page() {
         onAddClick={() => setIsAddDialogOpen(true)}
         selectedChain={selectedChain}
         onChainChange={setSelectedChain}
+        selectedTag={selectedTag}
+        onTagChange={setSelectedTag}
         onRefreshAll={handleRefreshAll}
         isRefreshing={isRefreshingAll}
       />

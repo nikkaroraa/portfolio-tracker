@@ -190,7 +190,7 @@ export function useEthereumBalance(address: string, chain: string) {
   return useQuery({
     queryKey: ["ethereumBalance", address, chain],
     queryFn: () => fetchEthereumBalance(address, chain),
-    enabled: Boolean(address && chain),
+    enabled: false, // Don't fetch automatically
   });
 }
 
@@ -198,7 +198,7 @@ export function useAllEthereumChains(address: string) {
   return useQuery({
     queryKey: ["allEthereumChains", address],
     queryFn: () => fetchAllEthereumChains(address),
-    enabled: Boolean(address),
+    enabled: false, // Don't fetch automatically
     staleTime: 30000, // 30 seconds
   });
 }

@@ -34,7 +34,11 @@ export function useThemeState(): ThemeContextType {
 
   useEffect(() => {
     // Save theme to localStorage when it changes
-    localStorage.setItem("theme", theme);
+    try {
+      localStorage.setItem("theme", theme);
+    } catch (error) {
+      console.warn("Failed to save theme to localStorage:", error);
+    }
   }, [theme]);
 
   useEffect(() => {

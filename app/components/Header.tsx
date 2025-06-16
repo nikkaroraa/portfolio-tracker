@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Wallet, RefreshCw } from "lucide-react";
+import { Plus, Wallet, RefreshCw, Tag as TagIcon, BarChart3 } from "lucide-react";
+import Link from "next/link";
 import {
   Select,
   SelectContent,
@@ -8,13 +9,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { SUPPORTED_CHAINS } from "../types";
 import { ThemeToggle } from "./ThemeToggle";
+import { useTags } from "../hooks/useTags";
 
 interface HeaderProps {
   onAddClick: () => void;
   selectedChain: string;
   onChainChange: (chain: string) => void;
+  selectedTag: string;
+  onTagChange: (tagId: string) => void;
   onRefreshAll: () => void;
   isRefreshing: boolean;
 }
@@ -23,9 +28,12 @@ export function Header({
   onAddClick,
   selectedChain,
   onChainChange,
+  selectedTag,
+  onTagChange,
   onRefreshAll,
   isRefreshing,
 }: HeaderProps) {
+  const { tags } = useTags();
   return (
     <div className="mb-8 space-y-6">
       {/* Theme Toggle - Top Right */}
@@ -45,32 +53,75 @@ export function Header({
       </div>
 
       {/* Controls Section */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-        {/* Chain Filter */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-muted-foreground hidden sm:inline">
-            Filter by chain:
-          </span>
-          <Select value={selectedChain} onValueChange={onChainChange}>
-            <SelectTrigger className="w-[180px] cursor-pointer">
-              <SelectValue placeholder="All Chains" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all" className="cursor-pointer">All Chains</SelectItem>
-              {SUPPORTED_CHAINS.map((chain) => (
-                <SelectItem key={chain.value} value={chain.value} className="cursor-pointer">
+      <div className="space-y-4">
+        {/* Filters Row */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+          {/* Chain Filter */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-muted-foreground hidden sm:inline">
+              Filter by chain:
+            </span>
+            <Select value={selectedChain} onValueChange={onChainChange}>
+              <SelectTrigger className="w-[180px] cursor-pointer">
+                <SelectValue placeholder="All Chains" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="cursor-pointer">All Chains</SelectItem>
+                {SUPPORTED_CHAINS.map((chain) => (
+                  <SelectItem key={chain.value} value={chain.value} className="cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${chain.color}`} />
+                      {chain.label}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Tag Filter */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-muted-foreground hidden sm:inline">
+              Filter by tag:
+            </span>
+            <Select value={selectedTag} onValueChange={onTagChange}>
+              <SelectTrigger className="w-[180px] cursor-pointer">
+                <SelectValue placeholder="All Tags" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="cursor-pointer">
                   <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full ${chain.color}`} />
-                    {chain.label}
+                    <TagIcon className="h-4 w-4" />
+                    All Tags
                   </div>
                 </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                {tags.map((tag) => (
+                  <SelectItem key={tag.id} value={tag.id} className="cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="secondary"
+                        style={{ backgroundColor: tag.color + "20", color: tag.color, borderColor: tag.color }}
+                        className="text-xs px-1 py-0"
+                      >
+                        {tag.name}
+                      </Badge>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-3">
+        {/* Action Buttons Row */}
+        <div className="flex items-center justify-center gap-3">
+          <Link href="/dashboard">
+            <Button size="lg" variant="outline" className="cursor-pointer">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Dashboard
+            </Button>
+          </Link>
+          
           <Button 
             onClick={onRefreshAll} 
             size="lg" 
