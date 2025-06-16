@@ -17,9 +17,12 @@ import {
 interface PortfolioSummaryProps {
   addresses: Address[];
   onPriceUpdate?: (date: Date) => void;
+  onRefreshCallback?: (refreshFn: () => Promise<void>) => void;
+  onFetchingChange?: (isFetching: boolean) => void;
+  onDirectRefresh?: () => void;
 }
 
-export function PortfolioSummary({ addresses, onPriceUpdate }: PortfolioSummaryProps) {
+export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, onFetchingChange, onDirectRefresh }: PortfolioSummaryProps) {
   // Extract all unique symbols from addresses
   const symbols = React.useMemo(() => {
     const symbolSet = new Set<string>();
@@ -62,16 +65,46 @@ export function PortfolioSummary({ addresses, onPriceUpdate }: PortfolioSummaryP
     return calculatePortfolioSummary(addresses, prices);
   }, [addresses, prices]);
 
-  const handleRefreshPrices = async () => {
-    try {
-      await refetchPrices();
+  const handleRefreshPrices = React.useCallback(() => {
+    return refetchPrices().then((result) => {
       if (onPriceUpdate) {
         onPriceUpdate(new Date());
       }
-    } catch (error) {
+    }).catch((error) => {
       console.error('Failed to refresh prices:', error);
+    });
+  }, [refetchPrices, onPriceUpdate]);
+
+  // Provide refresh function to parent
+  React.useEffect(() => {
+    if (onRefreshCallback) {
+      onRefreshCallback(handleRefreshPrices);
     }
-  };
+  }, [handleRefreshPrices, onRefreshCallback]);
+
+  // Also provide a direct refresh method
+  React.useEffect(() => {
+    if (onDirectRefresh) {
+      // Assign the refetch function directly to a global or pass it up
+      (window as any).refreshPricesDirectly = async () => {
+        try {
+          await refetchPrices();
+          if (onPriceUpdate) {
+            onPriceUpdate(new Date());
+          }
+        } catch (error) {
+          console.error('Failed to refresh prices:', error);
+        }
+      };
+    }
+  }, [refetchPrices, onPriceUpdate, onDirectRefresh]);
+
+  // Notify parent of fetching state changes
+  React.useEffect(() => {
+    if (onFetchingChange) {
+      onFetchingChange(isFetchingPrices);
+    }
+  }, [isFetchingPrices, onFetchingChange]);
 
   // Notify parent when prices are successfully loaded
   React.useEffect(() => {
@@ -128,20 +161,30 @@ export function PortfolioSummary({ addresses, onPriceUpdate }: PortfolioSummaryP
     <div className="mb-6 space-y-6">
       {/* Price Error Alert */}
       {pricesError && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/30">
           <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>
-            Failed to fetch cryptocurrency prices. This might be due to rate limiting. 
-            {pricesError instanceof Error ? ` Error: ${pricesError.message}` : ''}
+          <AlertDescription className="flex items-center justify-between">
+            <div className="flex-1">
+              <div className="font-medium text-red-800 dark:text-red-200 mb-1">
+                Unable to fetch cryptocurrency prices
+              </div>
+              <div className="text-sm text-red-600 dark:text-red-300">
+                {pricesError instanceof Error && pricesError.message.includes('Rate limit') 
+                  ? 'Rate limit reached. Please wait a moment before trying again.'
+                  : pricesError instanceof Error 
+                    ? pricesError.message 
+                    : 'This might be due to network issues or rate limiting.'}
+              </div>
+            </div>
             <Button 
               variant="outline" 
               size="sm" 
               onClick={handleRefreshPrices}
               disabled={isFetchingPrices}
-              className="ml-2"
+              className="ml-4 border-red-300 text-red-700 hover:bg-red-100 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/20"
             >
-              <RefreshCw className={`h-3 w-3 mr-1 ${isFetchingPrices ? 'animate-spin' : ''}`} />
-              Retry
+              <RefreshCw className={`h-3 w-3 mr-2 ${isFetchingPrices ? 'animate-spin' : ''}`} />
+              {isFetchingPrices ? 'Retrying...' : 'Try Again'}
             </Button>
           </AlertDescription>
         </Alert>
@@ -150,22 +193,10 @@ export function PortfolioSummary({ addresses, onPriceUpdate }: PortfolioSummaryP
       {/* Main Summary Card */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <PieChart className="h-5 w-5" />
-              Portfolio Summary
-            </CardTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRefreshPrices}
-              disabled={isFetchingPrices || symbols.length === 0}
-              className="cursor-pointer"
-            >
-              <RefreshCw className={`h-4 w-4 mr-2 ${isFetchingPrices ? 'animate-spin' : ''}`} />
-              {isFetchingPrices ? 'Updating...' : 'Refresh Prices'}
-            </Button>
-          </div>
+          <CardTitle className="flex items-center gap-2">
+            <PieChart className="h-5 w-5" />
+            Portfolio Summary
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -256,10 +287,10 @@ export function PortfolioSummary({ addresses, onPriceUpdate }: PortfolioSummaryP
           </CardContent>
         </Card>
 
-        {/* Top Token Holdings */}
+        {/* Top Holdings */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Top Token Holdings</CardTitle>
+            <CardTitle className="text-lg">Top Holdings</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -273,7 +304,7 @@ export function PortfolioSummary({ addresses, onPriceUpdate }: PortfolioSummaryP
                       <div>
                         <div className="font-medium">{token.name}</div>
                         <div className="text-sm text-muted-foreground">
-                          {formatNumber(token.totalBalance)} tokens
+                          {formatNumber(token.totalBalance)} {token.symbol}
                         </div>
                       </div>
                     </div>
@@ -288,7 +319,7 @@ export function PortfolioSummary({ addresses, onPriceUpdate }: PortfolioSummaryP
               ) : (
                 <div className="text-center text-muted-foreground py-8">
                   <Coins className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p>No token holdings found</p>
+                  <p>No holdings found</p>
                 </div>
               )}
             </div>
@@ -296,40 +327,6 @@ export function PortfolioSummary({ addresses, onPriceUpdate }: PortfolioSummaryP
         </Card>
       </div>
 
-      {/* Native Assets */}
-      {portfolioSummary.nativeAssets.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Native Assets</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {portfolioSummary.nativeAssets.map((asset, index) => (
-                <div key={`${asset.chain}-${index}`} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${
-                      asset.chain === 'bitcoin' ? 'bg-orange-500' :
-                      asset.chain === 'solana' ? 'bg-purple-500' : 'bg-blue-500'
-                    }`} />
-                    <div>
-                      <div className="font-medium">{asset.symbol}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {formatNumber(asset.balance)} {asset.symbol}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-medium">{formatCurrency(asset.usdValue)}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {asset.percentage.toFixed(1)}%
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }
