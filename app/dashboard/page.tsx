@@ -79,46 +79,54 @@ export default function DashboardPage() {
           
           {/* Controls */}
           {addresses.length > 0 && (
-            <div className="flex flex-col items-center gap-3 mt-4">
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleRefreshPositions}
-                  disabled={isFetchingPositions}
-                  className="cursor-pointer"
-                >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${isFetchingPositions ? 'animate-spin' : ''}`} />
-                  {isFetchingPositions ? 'Refreshing...' : 'Refresh Positions'}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    if (typeof refreshPrices === 'function') {
-                      refreshPrices();
-                    } else if (window.refreshPricesDirectly) {
-                      window.refreshPricesDirectly();
-                    }
-                  }}
-                  disabled={isFetchingPrices || !refreshPrices}
-                  className="cursor-pointer"
-                >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${isFetchingPrices ? 'animate-spin' : ''}`} />
-                  {isFetchingPrices ? 'Updating...' : 'Refresh Prices'}
-                </Button>
-              </div>
-              <div className="flex flex-col items-center gap-1 text-sm text-muted-foreground">
-                {lastPositionUpdate && (
-                  <span>
-                    Positions last updated: {lastPositionUpdate.toLocaleTimeString()}
-                  </span>
-                )}
-                {lastPriceUpdate && (
-                  <span>
-                    Prices last updated: {lastPriceUpdate.toLocaleTimeString()}
-                  </span>
-                )}
+            <div className="flex justify-center mt-4">
+              <div className="flex items-center gap-8">
+                {/* Refresh Positions Section */}
+                <div className="flex flex-col items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRefreshPositions}
+                    disabled={isFetchingPositions}
+                    className="cursor-pointer"
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${isFetchingPositions ? 'animate-spin' : ''}`} />
+                    {isFetchingPositions ? 'Refreshing...' : 'Refresh Positions'}
+                  </Button>
+                  {lastPositionUpdate && (
+                    <span className="text-sm text-muted-foreground">
+                      Last updated: {lastPositionUpdate.toLocaleTimeString()}
+                    </span>
+                  )}
+                </div>
+
+                {/* Vertical Divider */}
+                <div className="h-16 w-px bg-border"></div>
+
+                {/* Refresh Prices Section */}
+                <div className="flex flex-col items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (typeof refreshPrices === 'function') {
+                        refreshPrices();
+                      } else if (window.refreshPricesDirectly) {
+                        window.refreshPricesDirectly();
+                      }
+                    }}
+                    disabled={isFetchingPrices || !refreshPrices}
+                    className="cursor-pointer"
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${isFetchingPrices ? 'animate-spin' : ''}`} />
+                    {isFetchingPrices ? 'Updating...' : 'Refresh Prices'}
+                  </Button>
+                  {lastPriceUpdate && (
+                    <span className="text-sm text-muted-foreground">
+                      Last updated: {lastPriceUpdate.toLocaleTimeString()}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           )}
