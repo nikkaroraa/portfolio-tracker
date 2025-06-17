@@ -23,7 +23,6 @@ export default function Page() {
     updateAddress,
     deleteAddress,
     updateAddressBalance,
-    reorderAddresses,
   } = useAddresses();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -169,7 +168,6 @@ export default function Page() {
         onAddClick={() => setIsAddDialogOpen(true)}
         onBalanceUpdate={handleBalanceUpdate}
         onChainDataUpdate={handleChainDataUpdate}
-        onReorder={reorderAddresses}
       />
 
       <AddAddressDialog

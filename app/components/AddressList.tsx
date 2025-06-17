@@ -2,7 +2,7 @@ import * as React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Wallet } from "lucide-react";
+import { Plus, Wallet, ChevronDown, ChevronRight } from "lucide-react";
 import { Address, ChainData } from "../types";
 import { AddressCard } from "./AddressCard";
 
@@ -18,7 +18,6 @@ interface AddressListProps {
     tokens?: Address["tokens"]
   ) => void;
   onChainDataUpdate: (id: string, chainData: ChainData[]) => void;
-  onReorder: (addresses: Address[]) => void;
 }
 
 export function AddressList({
@@ -28,37 +27,8 @@ export function AddressList({
   onAddClick,
   onBalanceUpdate,
   onChainDataUpdate,
-  onReorder,
 }: AddressListProps) {
-  const [draggedItem, setDraggedItem] = React.useState<string | null>(null);
-
-  const handleDragStart = (e: React.DragEvent, id: string) => {
-    setDraggedItem(id);
-    e.dataTransfer.effectAllowed = "move";
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
-
-  const handleDrop = (e: React.DragEvent, targetId: string) => {
-    e.preventDefault();
-
-    if (draggedItem && draggedItem !== targetId) {
-      const draggedIndex = addresses.findIndex(
-        (addr) => addr.id === draggedItem
-      );
-      const targetIndex = addresses.findIndex((addr) => addr.id === targetId);
-
-      const newAddresses = [...addresses];
-      const [draggedAddress] = newAddresses.splice(draggedIndex, 1);
-      newAddresses.splice(targetIndex, 0, draggedAddress);
-
-      onReorder(newAddresses);
-    }
-    setDraggedItem(null);
-  };
+  const [collapsedGroups, setCollapsedGroups] = React.useState<Set<string>>(new Set());
 
   // Group addresses by label
   const groupedAddresses = React.useMemo(() => {
@@ -78,6 +48,18 @@ export function AddressList({
       count: addressList.length
     }));
   }, [addresses]);
+
+  const toggleGroup = (label: string) => {
+    setCollapsedGroups(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(label)) {
+        newSet.delete(label);
+      } else {
+        newSet.add(label);
+      }
+      return newSet;
+    });
+  };
 
   if (addresses.length === 0) {
     return (
@@ -102,9 +84,17 @@ export function AddressList({
       {groupedAddresses.map((group) => (
         <div key={group.label} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
           {/* Group Header */}
-          <div className="bg-muted/30 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          <div 
+            className="bg-muted/30 px-4 py-3 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={() => toggleGroup(group.label)}
+          >
             <div className="flex items-center justify-between">
-              <div>
+              <div className="flex items-center gap-2">
+                {collapsedGroups.has(group.label) ? (
+                  <ChevronRight className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
                 <div className="font-semibold">{group.label}</div>
               </div>
               <div className="text-right">
@@ -116,24 +106,22 @@ export function AddressList({
           </div>
 
           {/* Addresses in Group */}
-          <div className="p-4">
-            <div className="grid gap-4">
-              {group.addresses.map((address) => (
-                <AddressCard
-                  key={address.id}
-                  address={address}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
-                  onDragStart={handleDragStart}
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
-                  isDragging={draggedItem === address.id}
-                  onBalanceUpdate={onBalanceUpdate}
-                  onChainDataUpdate={onChainDataUpdate}
-                />
-              ))}
+          {!collapsedGroups.has(group.label) && (
+            <div className="p-4">
+              <div className="grid gap-4">
+                {group.addresses.map((address) => (
+                  <AddressCard
+                    key={address.id}
+                    address={address}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                    onBalanceUpdate={onBalanceUpdate}
+                    onChainDataUpdate={onChainDataUpdate}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       ))}
     </div>

@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2, Edit2, GripVertical, RefreshCw, ChevronDown, ChevronRight } from "lucide-react";
+import { Trash2, Edit2, RefreshCw, ChevronDown, ChevronRight } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import {
   Address,
@@ -74,10 +74,6 @@ interface AddressCardProps {
   address: Address;
   onEdit: (address: Address) => void;
   onDelete: (id: string) => void;
-  onDragStart: (e: React.DragEvent, id: string) => void;
-  onDragOver: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent, id: string) => void;
-  isDragging: boolean;
   onBalanceUpdate: (
     id: string,
     balance: number,
@@ -91,10 +87,6 @@ export function AddressCard({
   address,
   onEdit,
   onDelete,
-  onDragStart,
-  onDragOver,
-  onDrop,
-  isDragging,
   onBalanceUpdate,
   onChainDataUpdate,
 }: AddressCardProps) {
@@ -195,19 +187,10 @@ export function AddressCard({
   const selectedChainData = getSelectedChainData();
 
   return (
-    <Card
-      className={`transition-all duration-200 ${
-        isDragging ? "opacity-50" : ""
-      }`}
-      draggable
-      onDragStart={(e) => onDragStart(e, address.id)}
-      onDragOver={onDragOver}
-      onDrop={(e) => onDrop(e, address.id)}
-    >
+    <Card className="transition-all duration-200">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab hover:cursor-grabbing" />
             <div className="flex flex-col gap-0.5">
               <div className="flex items-center gap-2">
                 {chainInfo && (
