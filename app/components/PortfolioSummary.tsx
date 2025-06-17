@@ -4,9 +4,25 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { TrendingUp, TrendingDown, DollarSign, PieChart, Coins, RefreshCw, AlertTriangle } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, PieChart, Coins, RefreshCw, AlertTriangle, ChevronDown, ChevronRight } from "lucide-react";
 import { Address, ChainData } from "../types";
 import { usePrices } from "../hooks/usePrices";
+
+interface AssetBreakdownItem {
+  symbol: string;
+  name?: string;
+  balance: number;
+  usdValue: number;
+  chain: string;
+  type: 'native' | 'token';
+}
+
+interface AddressBreakdown {
+  addressLabel: string;
+  address: string;
+  assets: AssetBreakdownItem[];
+  totalValue: number;
+}
 
 declare global {
   interface Window {
@@ -31,6 +47,7 @@ interface PortfolioSummaryProps {
 }
 
 export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, onFetchingChange, onDirectRefresh, onAddressUpdate }: PortfolioSummaryProps) {
+  const [showBreakdown, setShowBreakdown] = React.useState(false);
   
   // Get all Ethereum addresses (including L2s)
   const ethereumAddresses = React.useMemo(() => {
@@ -114,6 +131,101 @@ export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, 
   const portfolioSummary = React.useMemo(() => {
     if (!prices || addresses.length === 0) return null;
     return calculatePortfolioSummary(addresses, prices);
+  }, [addresses, prices]);
+
+  // Asset breakdown data for detailed view
+  const assetBreakdown = React.useMemo(() => {
+    if (!prices) return [];
+    
+    const breakdown: AddressBreakdown[] = [];
+    
+    addresses.forEach(address => {
+      const assets: AssetBreakdownItem[] = [];
+      
+      if (address.chain === 'ethereum' && address.chainData) {
+        // Multi-chain Ethereum addresses
+        address.chainData.forEach(chainData => {
+          if (chainData.balance && chainData.balance > 0) {
+            const symbol = chainData.chain === 'bitcoin' ? 'BTC' : 
+                          chainData.chain === 'solana' ? 'SOL' : 
+                          chainData.chain === 'polygon' ? 'POL' : 'ETH';
+            const price = prices[symbol]?.price || 0;
+            const usdValue = chainData.balance * price;
+            
+            assets.push({
+              symbol,
+              balance: chainData.balance,
+              usdValue,
+              chain: chainData.chain,
+              type: 'native'
+            });
+          }
+          
+          chainData.tokens?.forEach(token => {
+            if (Number(token.balance) > 0) {
+              const price = prices[token.symbol]?.price || 0;
+              const balance = Number(token.balance);
+              const usdValue = balance * price;
+              
+              assets.push({
+                symbol: token.symbol,
+                name: token.name,
+                balance,
+                usdValue,
+                chain: chainData.chain,
+                type: 'token'
+              });
+            }
+          });
+        });
+      } else {
+        // Single-chain addresses
+        if (address.balance && address.balance > 0) {
+          const symbol = address.chain === 'bitcoin' ? 'BTC' : 
+                        address.chain === 'solana' ? 'SOL' : 
+                        address.chain === 'polygon' ? 'POL' : 'ETH';
+          const price = prices[symbol]?.price || 0;
+          const usdValue = address.balance * price;
+          
+          assets.push({
+            symbol,
+            balance: address.balance,
+            usdValue,
+            chain: address.chain,
+            type: 'native'
+          });
+        }
+        
+        address.tokens?.forEach(token => {
+          if (Number(token.balance) > 0) {
+            const price = prices[token.symbol]?.price || 0;
+            const balance = Number(token.balance);
+            const usdValue = balance * price;
+            
+            assets.push({
+              symbol: token.symbol,
+              name: token.name,
+              balance,
+              usdValue,
+              chain: address.chain,
+              type: 'token'
+            });
+          }
+        });
+      }
+      
+      if (assets.length > 0) {
+        const totalValue = assets.reduce((sum, asset) => sum + asset.usdValue, 0);
+        breakdown.push({
+          addressLabel: address.label,
+          address: address.address,
+          assets: assets.sort((a, b) => b.usdValue - a.usdValue),
+          totalValue
+        });
+      }
+    });
+    
+    return breakdown.sort((a, b) => b.totalValue - a.totalValue);
   }, [addresses, prices]);
 
 
@@ -378,6 +490,95 @@ export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, 
         </Card>
       </div>
 
+      {/* Asset Breakdown Section */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Coins className="h-5 w-5" />
+              Asset Breakdown
+            </CardTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowBreakdown(!showBreakdown)}
+              className="cursor-pointer"
+            >
+              {showBreakdown ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )}
+              {showBreakdown ? 'Hide' : 'Show'} Details
+            </Button>
+          </div>
+        </CardHeader>
+        {showBreakdown && (
+          <CardContent>
+            <div className="space-y-4">
+              <div className="text-sm text-muted-foreground">
+                Detailed breakdown of all assets by address and chain. Values sorted by USD amount.
+              </div>
+              
+              {assetBreakdown.length > 0 ? (
+                <div className="space-y-6">
+                  {assetBreakdown.map((addressData, index) => (
+                    <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                      <div className="bg-muted/30 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-semibold">{addressData.addressLabel}</div>
+                            <div className="text-xs text-muted-foreground font-mono">
+                              {addressData.address.slice(0, 8)}...{addressData.address.slice(-6)}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-semibold">{formatCurrency(addressData.totalValue)}</div>
+                            <div className="text-xs text-muted-foreground">{addressData.assets.length} assets</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        <div className="space-y-3">
+                          {addressData.assets.map((asset, assetIndex) => (
+                            <div key={assetIndex} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
+                              <div className="flex items-center gap-3">
+                                <Badge variant="outline" className="text-xs">
+                                  {asset.chain}
+                                </Badge>
+                                <Badge variant={asset.type === 'native' ? 'default' : 'secondary'} className="text-xs">
+                                  {asset.type}
+                                </Badge>
+                                <div>
+                                  <div className="font-medium">{asset.symbol}</div>
+                                  {asset.name && asset.name !== asset.symbol && (
+                                    <div className="text-xs text-muted-foreground">{asset.name}</div>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="font-medium">{formatCurrency(asset.usdValue)}</div>
+                                <div className="text-xs text-muted-foreground font-mono">
+                                  {formatNumber(asset.balance)} {asset.symbol}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-muted-foreground py-8">
+                  <Coins className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>No assets to display</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        )}
+      </Card>
 
     </div>
   );
