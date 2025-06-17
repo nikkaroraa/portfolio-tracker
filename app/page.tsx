@@ -4,6 +4,7 @@ import * as React from "react";
 import { useState } from "react";
 import { Address, ChainData, Tag } from "./types";
 import { useAddresses } from "./hooks/useAddresses";
+import { TIMEOUTS } from "./lib/constants";
 import { Header } from "./components/Header";
 import { AddressList } from "./components/AddressList";
 import { AddAddressDialog } from "./components/AddAddressDialog";
@@ -125,7 +126,7 @@ export default function Page() {
     // This is a simple approach - in a real app you might want more sophisticated coordination
     setTimeout(() => {
       setIsRefreshingAll(false);
-    }, 3000);
+    }, TIMEOUTS.REFRESH_DELAY);
   };
 
   if (!isAuthenticated) {

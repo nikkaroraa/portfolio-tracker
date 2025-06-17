@@ -1,4 +1,5 @@
 import { Address } from "../types";
+import { CHAIN_SYMBOLS, CHAIN_INFO, ChainType } from "./constants";
 
 export interface PortfolioAsset {
   symbol: string;
@@ -41,34 +42,11 @@ export interface PortfolioSummary {
 }
 
 function getChainSymbol(chain: string): string {
-  switch (chain) {
-    case 'bitcoin':
-      return 'BTC';
-    case 'ethereum':
-    case 'arbitrum':
-    case 'polygon':
-    case 'optimism':
-    case 'base':
-      return 'ETH';
-    case 'solana':
-      return 'SOL';
-    default:
-      return '';
-  }
+  return CHAIN_SYMBOLS[chain as ChainType] || '';
 }
 
 function getChainInfo(chain: string) {
-  const chainMap: Record<string, { label: string; color: string }> = {
-    bitcoin: { label: 'Bitcoin', color: 'bg-orange-500' },
-    ethereum: { label: 'Ethereum', color: 'bg-blue-500' },
-    arbitrum: { label: 'Arbitrum', color: 'bg-blue-400' },
-    polygon: { label: 'Polygon', color: 'bg-purple-500' },
-    optimism: { label: 'Optimism', color: 'bg-red-500' },
-    base: { label: 'Base', color: 'bg-blue-600' },
-    solana: { label: 'Solana', color: 'bg-purple-500' },
-  };
-  
-  return chainMap[chain] || { label: chain, color: 'bg-gray-500' };
+  return CHAIN_INFO[chain as ChainType] || { label: chain, color: 'bg-gray-500' };
 }
 
 export function calculatePortfolioSummary(

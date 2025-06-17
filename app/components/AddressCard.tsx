@@ -20,25 +20,14 @@ import {
 import { useBitcoinBalance } from "../hooks/useBitcoinBalance";
 import { useAllEthereumChains } from "../hooks/useEthereumBalance";
 import { useSolanaBalance } from "../hooks/useSolanaBalance";
+import { CHAIN_SYMBOLS, ChainType } from "../lib/constants";
 
 function getChainInfo(chainValue: string): ChainInfo | undefined {
   return SUPPORTED_CHAINS.find((chain) => chain.value === chainValue);
 }
 
 function getChainSymbol(chainValue: string): string {
-  const chainInfo = getChainInfo(chainValue);
-  if (chainInfo?.symbol) {
-    return chainInfo.symbol;
-  }
-  // Default to ETH for Ethereum-based chains
-  if (["ethereum", "arbitrum", "polygon", "optimism", "base"].includes(chainValue)) {
-    return "ETH";
-  }
-  // Default to SOL for Solana
-  if (chainValue === "solana") {
-    return "SOL";
-  }
-  return "";
+  return CHAIN_SYMBOLS[chainValue as ChainType] || '';
 }
 
 function formatDate(date: Date): string {

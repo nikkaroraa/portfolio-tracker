@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useAddresses } from "../hooks/useAddresses";
 import { PortfolioSummary } from "../components/PortfolioSummary";
 import { LoadingScreen } from "../components/LoadingScreen";
+import { TIMEOUTS } from "../lib/constants";
 
 export default function DashboardPage() {
   const { addresses, loading, error, updateAddressChainData } = useAddresses();
@@ -28,13 +29,9 @@ export default function DashboardPage() {
   const handleRefreshPositions = async () => {
     setIsFetchingPositions(true);
     
-    console.log('🔍 Dashboard: Dispatching refreshAllAddresses event');
-    
     // Dispatch the same custom event that the main page uses
     const refreshEvent = new CustomEvent('refreshAllAddresses');
     window.dispatchEvent(refreshEvent);
-    
-    console.log('🔍 Dashboard: Event dispatched');
     
     // Set the last updated time
     setLastPositionUpdate(new Date());
@@ -42,7 +39,7 @@ export default function DashboardPage() {
     // Wait for refreshes to complete
     setTimeout(() => {
       setIsFetchingPositions(false);
-    }, 3000);
+    }, TIMEOUTS.REFRESH_DELAY);
   };
 
   if (loading) {
