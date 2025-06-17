@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Wallet, RefreshCw, Tag as TagIcon, BarChart3 } from "lucide-react";
-import Link from "next/link";
+import { Plus, Wallet, RefreshCw, Tag as TagIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -11,7 +10,6 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { SUPPORTED_CHAINS } from "../types";
-import { ThemeToggle } from "./ThemeToggle";
 import { useTags } from "../hooks/useTags";
 
 interface HeaderProps {
@@ -36,11 +34,6 @@ export function Header({
   const { tags } = useTags();
   return (
     <div className="mb-8 space-y-6">
-      {/* Theme Toggle - Top Right */}
-      <div className="flex justify-end mb-4">
-        <ThemeToggle />
-      </div>
-
       {/* Title Section */}
       <div className="text-center">
         <h1 className="text-4xl font-bold flex items-center justify-center gap-3 mb-3">
@@ -115,13 +108,6 @@ export function Header({
 
         {/* Action Buttons Row */}
         <div className="flex items-center justify-center gap-3">
-          <Link href="/dashboard">
-            <Button size="lg" variant="outline" className="cursor-pointer">
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Dashboard
-            </Button>
-          </Link>
-          
           <Button 
             onClick={onRefreshAll} 
             size="lg" 

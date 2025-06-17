@@ -10,8 +10,7 @@ declare global {
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw } from "lucide-react";
-import Link from "next/link";
+import { RefreshCw } from "lucide-react";
 import { useAddresses } from "../hooks/useAddresses";
 import { PortfolioSummary } from "../components/PortfolioSummary";
 import { LoadingScreen } from "../components/LoadingScreen";
@@ -60,16 +59,6 @@ export default function DashboardPage() {
     <div className="container mx-auto p-6 max-w-6xl">
       {/* Header */}
       <div className="mb-8">
-        {/* Navigation */}
-        <div className="mb-6">
-          <Link href="/">
-            <Button variant="ghost" size="sm" className="cursor-pointer">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Wallets
-            </Button>
-          </Link>
-        </div>
-        
         {/* Title Section */}
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-3">Portfolio Dashboard</h1>
@@ -141,11 +130,12 @@ export default function DashboardPage() {
             <p className="text-muted-foreground mb-4">
               Add some wallet addresses to see your portfolio dashboard
             </p>
-            <Link href="/">
-              <Button className="cursor-pointer">
-                Add Your First Wallet
-              </Button>
-            </Link>
+            <Button 
+              onClick={() => window.location.href = '/'} 
+              className="cursor-pointer"
+            >
+              Add Your First Wallet
+            </Button>
           </CardContent>
         </Card>
       ) : (
