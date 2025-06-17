@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { TrendingUp, TrendingDown, DollarSign, PieChart, Coins, RefreshCw, AlertTriangle, ChevronDown, ChevronRight } from "lucide-react";
 import { Address, ChainData } from "../types";
 import { usePrices } from "../hooks/usePrices";
+import { CHAIN_SYMBOLS } from "../lib/constants";
 
 interface AssetBreakdownItem {
   symbol: string;
@@ -99,8 +100,7 @@ export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, 
       if (address.chain === 'ethereum' && address.chainData) {
         address.chainData.forEach(chainData => {
           if (chainData.balance && chainData.balance > 0) {
-            const symbol = chainData.chain === 'bitcoin' ? 'BTC' : 
-                          chainData.chain === 'solana' ? 'SOL' : 'ETH';
+            const symbol = CHAIN_SYMBOLS[chainData.chain as keyof typeof CHAIN_SYMBOLS] || 'ETH';
             symbolSet.add(symbol);
           }
           chainData.tokens?.forEach(token => {
@@ -111,8 +111,7 @@ export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, 
         });
       } else {
         if (address.balance && address.balance > 0) {
-          const symbol = address.chain === 'bitcoin' ? 'BTC' : 
-                        address.chain === 'solana' ? 'SOL' : 'ETH';
+          const symbol = CHAIN_SYMBOLS[address.chain as keyof typeof CHAIN_SYMBOLS] || 'ETH';
           symbolSet.add(symbol);
         }
         address.tokens?.forEach(token => {
@@ -146,9 +145,7 @@ export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, 
         // Multi-chain Ethereum addresses
         address.chainData.forEach(chainData => {
           if (chainData.balance && chainData.balance > 0) {
-            const symbol = chainData.chain === 'bitcoin' ? 'BTC' : 
-                          chainData.chain === 'solana' ? 'SOL' : 
-                          chainData.chain === 'polygon' ? 'POL' : 'ETH';
+            const symbol = CHAIN_SYMBOLS[chainData.chain as keyof typeof CHAIN_SYMBOLS] || 'ETH';
             const price = prices[symbol]?.price || 0;
             const usdValue = chainData.balance * price;
             
@@ -181,9 +178,7 @@ export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, 
       } else {
         // Single-chain addresses
         if (address.balance && address.balance > 0) {
-          const symbol = address.chain === 'bitcoin' ? 'BTC' : 
-                        address.chain === 'solana' ? 'SOL' : 
-                        address.chain === 'polygon' ? 'POL' : 'ETH';
+          const symbol = CHAIN_SYMBOLS[address.chain as keyof typeof CHAIN_SYMBOLS] || 'ETH';
           const price = prices[symbol]?.price || 0;
           const usdValue = address.balance * price;
           

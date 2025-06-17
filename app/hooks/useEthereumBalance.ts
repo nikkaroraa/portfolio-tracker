@@ -46,6 +46,7 @@ function normalizeAddress(address: string): string {
 async function fetchEthereumBalance(address: string, chain: string) {
   const normalizedAddress = normalizeAddress(address);
   const alchemy = getAlchemyInstance(chain);
+  
 
   try {
     // Get ETH balance
@@ -57,6 +58,7 @@ async function fetchEthereumBalance(address: string, chain: string) {
     const tokenBalances = await alchemy.core.getTokenBalances(
       normalizedAddress
     );
+    
     const tokenMetadata = await Promise.all(
       tokenBalances.tokenBalances.map(async (token) => {
         if (token.tokenBalance === "0") return null;
@@ -67,6 +69,7 @@ async function fetchEthereumBalance(address: string, chain: string) {
           Number(token.tokenBalance || "0") /
           Math.pow(10, metadata.decimals || 18);
         const formattedTokenBalance = Number(tokenBalance.toFixed(6));
+        
         return {
           contractAddress: token.contractAddress,
           symbol: metadata.symbol || "UNKNOWN",
@@ -144,8 +147,9 @@ async function fetchEthereumBalance(address: string, chain: string) {
       to: transfer.to || normalizedAddress,
     }));
 
-    const filteredTokens = tokenMetadata
-      .filter((token): token is TokenBalance => token !== null)
+    const allTokens = tokenMetadata.filter((token): token is TokenBalance => token !== null);
+    
+    const filteredTokens = allTokens
       .filter((token) => SUPPORTED_TOKENS.includes(token.symbol))
       .filter((token) => Number(token.balance) > 0);
 
