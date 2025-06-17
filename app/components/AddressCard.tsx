@@ -69,6 +69,27 @@ function getExplorerUrl(chain: string, txHash: string): string {
   }
 }
 
+function getAddressExplorerUrl(chain: string, address: string): string {
+  switch (chain) {
+    case "ethereum":
+      return `https://etherscan.io/address/${address}`;
+    case "arbitrum":
+      return `https://arbiscan.io/address/${address}`;
+    case "polygon":
+      return `https://polygonscan.com/address/${address}`;
+    case "optimism":
+      return `https://optimistic.etherscan.io/address/${address}`;
+    case "base":
+      return `https://basescan.org/address/${address}`;
+    case "solana":
+      return `https://solscan.io/account/${address}`;
+    case "bitcoin":
+      return `https://mempool.space/address/${address}`;
+    default:
+      return "#";
+  }
+}
+
 
 interface AddressCardProps {
   address: Address;
@@ -209,9 +230,14 @@ export function AddressCard({
                 )}
               </div>
               <div className="mt-1">
-                <div className="text-sm font-mono text-muted-foreground">
+                <a
+                  href={getAddressExplorerUrl(address.chain, address.address)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-mono text-muted-foreground hover:text-foreground hover:underline cursor-pointer transition-colors"
+                >
                   {address.address}
-                </div>
+                </a>
                 {address.description && (
                   <div className="text-sm text-muted-foreground mt-0.5">
                     {address.description}
@@ -250,24 +276,6 @@ export function AddressCard({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Address */}
-          <div>
-            <Label className="text-sm text-muted-foreground">Address</Label>
-            <p className="font-mono text-sm break-all bg-muted p-2 rounded">
-              {address.address}
-            </p>
-          </div>
-
-          {/* Description */}
-          {address.description && (
-            <div>
-              <Label className="text-sm text-muted-foreground">Description</Label>
-              <p className="text-sm text-muted-foreground bg-muted p-2 rounded">
-                {address.description}
-              </p>
-            </div>
-          )}
-
           {/* Tags */}
           {address.tags && address.tags.length > 0 && (
             <div>
