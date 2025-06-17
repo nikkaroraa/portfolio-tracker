@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Plus, Wallet } from "lucide-react";
 import { Address, ChainData } from "../types";
 import { AddressCard } from "./AddressCard";
@@ -59,6 +60,25 @@ export function AddressList({
     setDraggedItem(null);
   };
 
+  // Group addresses by label
+  const groupedAddresses = React.useMemo(() => {
+    const groups = new Map<string, Address[]>();
+    
+    addresses.forEach(address => {
+      const label = address.label || "Unnamed";
+      if (!groups.has(label)) {
+        groups.set(label, []);
+      }
+      groups.get(label)!.push(address);
+    });
+
+    return Array.from(groups.entries()).map(([label, addressList]) => ({
+      label,
+      addresses: addressList,
+      count: addressList.length
+    }));
+  }, [addresses]);
+
   if (addresses.length === 0) {
     return (
       <Card>
@@ -78,20 +98,43 @@ export function AddressList({
   }
 
   return (
-    <div className="grid gap-4">
-      {addresses.map((address) => (
-        <AddressCard
-          key={address.id}
-          address={address}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          onDragStart={handleDragStart}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-          isDragging={draggedItem === address.id}
-          onBalanceUpdate={onBalanceUpdate}
-          onChainDataUpdate={onChainDataUpdate}
-        />
+    <div className="space-y-6">
+      {groupedAddresses.map((group) => (
+        <div key={group.label} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+          {/* Group Header */}
+          <div className="bg-muted/30 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-semibold">{group.label}</div>
+              </div>
+              <div className="text-right">
+                <Badge variant="secondary" className="text-xs">
+                  {group.count} {group.count === 1 ? 'address' : 'addresses'}
+                </Badge>
+              </div>
+            </div>
+          </div>
+
+          {/* Addresses in Group */}
+          <div className="p-4">
+            <div className="grid gap-4">
+              {group.addresses.map((address) => (
+                <AddressCard
+                  key={address.id}
+                  address={address}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  onDragStart={handleDragStart}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                  isDragging={draggedItem === address.id}
+                  onBalanceUpdate={onBalanceUpdate}
+                  onChainDataUpdate={onChainDataUpdate}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       ))}
     </div>
   );
