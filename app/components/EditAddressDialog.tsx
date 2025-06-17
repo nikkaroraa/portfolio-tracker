@@ -73,9 +73,9 @@ export function EditAddressDialog({
             <Label htmlFor="edit-label">Label</Label>
             <Input
               id="edit-label"
-              value={formData.label}
+              value={formData.name}
               onChange={(e) =>
-                setFormData({ ...formData, label: e.target.value })
+                setFormData({ ...formData, name: e.target.value })
               }
             />
           </div>

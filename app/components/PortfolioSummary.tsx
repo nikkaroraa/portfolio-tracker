@@ -19,7 +19,7 @@ interface AssetBreakdownItem {
 }
 
 interface AddressBreakdown {
-  addressLabel: string;
+  addressName: string;
   address: string;
   assets: AssetBreakdownItem[];
   totalValue: number;
@@ -212,7 +212,7 @@ export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, 
       if (assets.length > 0) {
         const totalValue = assets.reduce((sum, asset) => sum + asset.usdValue, 0);
         breakdown.push({
-          addressLabel: address.label,
+          addressName: address.name,
           address: address.address,
           assets: assets.sort((a, b) => b.usdValue - a.usdValue),
           totalValue
@@ -519,7 +519,7 @@ export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, 
                       <div className="bg-muted/30 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="font-semibold">{addressData.addressLabel}</div>
+                            <div className="font-semibold">{addressData.addressName}</div>
                             <div className="text-xs text-muted-foreground font-mono">
                               {addressData.address.slice(0, 8)}...{addressData.address.slice(-6)}
                             </div>

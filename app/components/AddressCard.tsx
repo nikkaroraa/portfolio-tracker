@@ -196,20 +196,27 @@ export function AddressCard({
                 {chainInfo && (
                   <div className={`w-3 h-3 rounded-full ${chainInfo.color}`} />
                 )}
-                <CardTitle className="text-lg">{address.label}</CardTitle>
                 <Badge variant="secondary">
                   {chainInfo?.symbol || address.chain.toUpperCase()}
                 </Badge>
+                <span className="text-xs text-muted-foreground font-medium">
+                  {chainInfo?.label}
+                </span>
                 {address.lastUpdated && (
                   <span className="text-xs text-muted-foreground">
                     • Updated {formatDate(new Date(address.lastUpdated))}
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-xs text-muted-foreground font-medium">
-                  {chainInfo?.label}
-                </span>
+              <div className="mt-1">
+                <div className="text-sm font-mono text-muted-foreground">
+                  {address.address}
+                </div>
+                {address.description && (
+                  <div className="text-sm text-muted-foreground mt-0.5">
+                    {address.description}
+                  </div>
+                )}
               </div>
             </div>
           </div>
