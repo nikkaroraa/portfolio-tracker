@@ -456,11 +456,8 @@ export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, 
                 portfolioSummary.topTokens.slice(0, 5).map((token) => (
                   <div key={token.symbol} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Badge variant="secondary" className="font-mono">
-                        {token.symbol}
-                      </Badge>
                       <div>
-                        <div className="font-medium">{token.name}</div>
+                        <div className="font-medium">{token.name} <Badge variant="secondary" className="font-mono ml-2">{token.symbol}</Badge></div>
                         <div className="text-sm text-muted-foreground">
                           {formatNumber(token.totalBalance)} {token.symbol}
                         </div>
