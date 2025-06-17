@@ -140,6 +140,36 @@ export function useAddresses() {
     }
   }
 
+  // Update address chain data specifically
+  const updateAddressChainData = async (id: string, chainData: Address['chainData']) => {
+    try {
+      setError(null)
+      
+      const updates: Partial<DatabaseAddress> = {
+        chain_data: chainData,
+        last_updated: new Date().toISOString(),
+      }
+
+      const { data, error } = await supabase
+        .from('addresses')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) throw error
+
+      const updatedAddress = convertFromDatabase(data as DatabaseAddress)
+      setAddresses(prev => prev.map(addr => addr.id === id ? updatedAddress : addr))
+      return updatedAddress
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update address chain data'
+      setError(errorMessage)
+      console.error('Error updating address chain data:', err)
+      throw new Error(errorMessage)
+    }
+  }
+
   // Reorder addresses
   const reorderAddresses = (newOrder: Address[]) => {
     setAddresses(newOrder)
@@ -159,6 +189,7 @@ export function useAddresses() {
     updateAddress,
     deleteAddress,
     updateAddressBalance,
+    updateAddressChainData,
     reorderAddresses,
     refetch: fetchAddresses,
   }
