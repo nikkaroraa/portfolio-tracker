@@ -95,7 +95,6 @@ export const SUPPORTED_TOKENS = [
   "WETH",
   "WSTETH",
   "stETH",
-  "rETH",
   "RETH",
   "USDC",
   "USDT",

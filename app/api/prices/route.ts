@@ -27,7 +27,6 @@ const COINGECKO_IDS: Record<string, string> = {
   "1INCH": "1inch",
   WSTETH: "wrapped-steth",
   stETH: "staked-ether",
-  rETH: "rocket-pool-eth",
   RETH: "rocket-pool-eth",
   EUL: "euler",
   PENDLE: "pendle",
@@ -39,12 +38,6 @@ const COINGECKO_IDS: Record<string, string> = {
   jitoSOL: "jito-staked-sol",
   cbBTC: "coinbase-wrapped-btc",
   JUP: "jupiter-exchange-solana",
-  DUST: "dust-protocol",
-  PYTH: "pyth-network",
-  GMT: "stepn",
-  ORCA: "orca",
-  USDCET: "usd-coin-ethereum-bridged",
-  SBR: "saber",
 };
 
 export async function GET(request: NextRequest) {
