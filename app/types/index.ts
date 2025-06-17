@@ -95,6 +95,8 @@ export const SUPPORTED_TOKENS = [
   "WETH",
   "WSTETH",
   "stETH",
+  "rETH",
+  "RETH",
   "USDC",
   "USDT",
   "EUL",
@@ -110,6 +112,7 @@ export const SUPPORTED_TOKENS = [
   "MKR",
   "SNX",
   "1INCH",
+  "POL",
 ];
 
 export const SUPPORTED_SPL_TOKENS: Record<
