@@ -234,7 +234,7 @@ export function AddressCard({
                   href={getAddressExplorerUrl(address.chain, address.address)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-base font-mono text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 hover:underline cursor-pointer transition-colors"
+                  className="text-base font-mono text-foreground font-medium hover:text-blue-600 dark:hover:text-blue-400 hover:underline cursor-pointer transition-colors"
                 >
                   {address.address}
                 </a>
@@ -275,7 +275,7 @@ export function AddressCard({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
+        <div className="space-y-2">
           {/* Tags */}
           {address.tags && address.tags.length > 0 && (
             <div>
