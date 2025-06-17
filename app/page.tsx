@@ -44,7 +44,7 @@ export default function Page() {
   });
 
   const handleAddAddress = async (data: {
-    label: string;
+    name: string;
     address: string;
     chain: string;
     network: string;
@@ -53,7 +53,7 @@ export default function Page() {
   }) => {
     try {
       await addAddress({
-        label: data.label,
+        name: data.name,
         address: data.address,
         chain: data.chain,
         network: data.network,
@@ -71,7 +71,7 @@ export default function Page() {
   const handleEditAddress = async (address: Address) => {
     try {
       await updateAddress(address.id, {
-        label: address.label,
+        name: address.name,
         address: address.address,
         chain: address.chain,
         network: address.network,

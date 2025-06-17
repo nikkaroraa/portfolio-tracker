@@ -29,7 +29,7 @@ export interface Tag {
 
 export interface Address {
   id: string;
-  label: string;
+  name: string;
   address: string;
   chain: string;
   network?: string;

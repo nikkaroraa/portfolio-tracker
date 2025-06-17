@@ -30,32 +30,32 @@ export function AddressList({
 }: AddressListProps) {
   const [collapsedGroups, setCollapsedGroups] = React.useState<Set<string>>(new Set());
 
-  // Group addresses by label
+  // Group addresses by name
   const groupedAddresses = React.useMemo(() => {
     const groups = new Map<string, Address[]>();
     
     addresses.forEach(address => {
-      const label = address.label || "Unnamed";
-      if (!groups.has(label)) {
-        groups.set(label, []);
+      const name = address.name || "Unnamed";
+      if (!groups.has(name)) {
+        groups.set(name, []);
       }
-      groups.get(label)!.push(address);
+      groups.get(name)!.push(address);
     });
 
-    return Array.from(groups.entries()).map(([label, addressList]) => ({
-      label,
+    return Array.from(groups.entries()).map(([name, addressList]) => ({
+      name,
       addresses: addressList,
       count: addressList.length
     }));
   }, [addresses]);
 
-  const toggleGroup = (label: string) => {
+  const toggleGroup = (name: string) => {
     setCollapsedGroups(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(label)) {
-        newSet.delete(label);
+      if (newSet.has(name)) {
+        newSet.delete(name);
       } else {
-        newSet.add(label);
+        newSet.add(name);
       }
       return newSet;
     });
@@ -82,20 +82,20 @@ export function AddressList({
   return (
     <div className="space-y-6">
       {groupedAddresses.map((group) => (
-        <div key={group.label} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div key={group.name} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
           {/* Group Header */}
           <div 
             className="bg-muted/30 px-4 py-3 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-muted/50 transition-colors"
-            onClick={() => toggleGroup(group.label)}
+            onClick={() => toggleGroup(group.name)}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                {collapsedGroups.has(group.label) ? (
+                {collapsedGroups.has(group.name) ? (
                   <ChevronRight className="h-4 w-4" />
                 ) : (
                   <ChevronDown className="h-4 w-4" />
                 )}
-                <div className="font-semibold">{group.label}</div>
+                <div className="font-semibold">{group.name}</div>
               </div>
               <div className="text-right">
                 <Badge variant="secondary" className="text-xs">
@@ -106,7 +106,7 @@ export function AddressList({
           </div>
 
           {/* Addresses in Group */}
-          {!collapsedGroups.has(group.label) && (
+          {!collapsedGroups.has(group.name) && (
             <div className="p-4">
               <div className="grid gap-4">
                 {group.addresses.map((address) => (

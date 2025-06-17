@@ -26,7 +26,7 @@ export interface DatabaseAddress {
 export function convertFromDatabase(dbAddress: DatabaseAddress): Address {
   return {
     id: dbAddress.id,
-    label: dbAddress.label,
+    name: dbAddress.label, // Map label column to name property
     address: dbAddress.address,
     chain: dbAddress.chain,
     network: dbAddress.network,
@@ -42,7 +42,7 @@ export function convertFromDatabase(dbAddress: DatabaseAddress): Address {
 
 export function convertToDatabase(address: Omit<Address, 'id'>): Omit<DatabaseAddress, 'id' | 'created_at' | 'updated_at'> {
   return {
-    label: address.label,
+    label: address.name, // Map name property to label column
     address: address.address,
     chain: address.chain,
     network: address.network,

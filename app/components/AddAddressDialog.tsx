@@ -25,7 +25,7 @@ interface AddAddressDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: {
-    label: string;
+    name: string;
     address: string;
     chain: string;
     network: string;
@@ -40,7 +40,7 @@ export function AddAddressDialog({
   onSubmit,
 }: AddAddressDialogProps) {
   const [formData, setFormData] = React.useState({
-    label: "",
+    name: "",
     address: "",
     chain: "",
     network: "mainnet",
@@ -49,13 +49,13 @@ export function AddAddressDialog({
   const [selectedTags, setSelectedTags] = React.useState<Tag[]>([]);
 
   const handleSubmit = () => {
-    if (formData.label && formData.address && formData.chain) {
+    if (formData.name && formData.address && formData.chain) {
       onSubmit({
         ...formData,
         description: formData.description || undefined,
         tags: selectedTags.length > 0 ? selectedTags : undefined,
       });
-      setFormData({ label: "", address: "", chain: "", network: "mainnet", description: "" });
+      setFormData({ name: "", address: "", chain: "", network: "mainnet", description: "" });
       setSelectedTags([]);
     }
   };
@@ -75,9 +75,9 @@ export function AddAddressDialog({
             <Input
               id="label"
               placeholder="e.g., Main Wallet, Trading Account"
-              value={formData.label}
+              value={formData.name}
               onChange={(e) =>
-                setFormData({ ...formData, label: e.target.value })
+                setFormData({ ...formData, name: e.target.value })
               }
             />
           </div>
