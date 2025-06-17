@@ -212,7 +212,17 @@ export function AddressCard({
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex flex-col gap-0.5">
+            <div className="flex flex-col gap-1">
+              <div>
+                <a
+                  href={getAddressExplorerUrl(address.chain, address.address)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-base font-mono text-foreground font-medium hover:text-blue-600 dark:hover:text-blue-400 hover:underline cursor-pointer transition-colors"
+                >
+                  {address.address}
+                </a>
+              </div>
               <div className="flex items-center gap-2">
                 {chainInfo && (
                   <div className={`w-3 h-3 rounded-full ${chainInfo.color}`} />
@@ -227,21 +237,6 @@ export function AddressCard({
                   <span className="text-xs text-muted-foreground">
                     • Updated {formatDate(new Date(address.lastUpdated))}
                   </span>
-                )}
-              </div>
-              <div className="mt-1">
-                <a
-                  href={getAddressExplorerUrl(address.chain, address.address)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base font-mono text-foreground font-medium hover:text-blue-600 dark:hover:text-blue-400 hover:underline cursor-pointer transition-colors"
-                >
-                  {address.address}
-                </a>
-                {address.description && (
-                  <div className="text-sm text-muted-foreground mt-0.5">
-                    {address.description}
-                  </div>
                 )}
               </div>
             </div>
@@ -275,7 +270,7 @@ export function AddressCard({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {/* Tags */}
           {address.tags && address.tags.length > 0 && (
             <div>
@@ -287,6 +282,16 @@ export function AddressCard({
                   </Badge>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Description */}
+          {address.description && (
+            <div>
+              <Label className="text-sm text-muted-foreground">Description</Label>
+              <p className="text-sm text-foreground mt-1">
+                {address.description}
+              </p>
             </div>
           )}
 
