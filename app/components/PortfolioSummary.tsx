@@ -403,7 +403,7 @@ export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, 
                 </div>
                 <div className="text-sm text-muted-foreground">
                   {formatCurrency(portfolioSummary.chainAllocations[0].usdValue)} 
-                  ({portfolioSummary.chainAllocations[0].percentage.toFixed(1)}%)
+                  ({portfolioSummary.chainAllocations[0].percentage.toFixed(2)}%)
                 </div>
               </div>
             )}
@@ -429,7 +429,7 @@ export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, 
                     <div className="text-right">
                       <div className="font-medium">{formatCurrency(allocation.usdValue)}</div>
                       <div className="text-sm text-muted-foreground">
-                        {allocation.percentage.toFixed(1)}%
+                        {allocation.percentage.toFixed(2)}%
                       </div>
                     </div>
                   </div>
@@ -469,7 +469,7 @@ export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, 
                     <div className="text-right">
                       <div className="font-medium">{formatCurrency(token.usdValue)}</div>
                       <div className="text-sm text-muted-foreground">
-                        {token.percentage.toFixed(1)}%
+                        {token.percentage.toFixed(2)}%
                       </div>
                     </div>
                   </div>
