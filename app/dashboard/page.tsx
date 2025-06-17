@@ -1,6 +1,12 @@
 "use client";
 
 import * as React from "react";
+
+declare global {
+  interface Window {
+    refreshPricesDirectly?: () => Promise<void>;
+  }
+}
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +17,7 @@ import { PortfolioSummary } from "../components/PortfolioSummary";
 import { LoadingScreen } from "../components/LoadingScreen";
 
 export default function DashboardPage() {
-  const { addresses, loading, error } = useAddresses();
+  const { addresses, loading, error, updateAddressChainData } = useAddresses();
   const [lastPriceUpdate, setLastPriceUpdate] = useState<Date | null>(null);
   const [lastPositionUpdate, setLastPositionUpdate] = useState<Date | null>(null);
   const [refreshPrices, setRefreshPrices] = useState<(() => Promise<void>) | null>(null);
@@ -22,9 +28,13 @@ export default function DashboardPage() {
   const handleRefreshPositions = async () => {
     setIsFetchingPositions(true);
     
+    console.log('🔍 Dashboard: Dispatching refreshAllAddresses event');
+    
     // Dispatch the same custom event that the main page uses
     const refreshEvent = new CustomEvent('refreshAllAddresses');
     window.dispatchEvent(refreshEvent);
+    
+    console.log('🔍 Dashboard: Event dispatched');
     
     // Set the last updated time
     setLastPositionUpdate(new Date());
@@ -90,8 +100,8 @@ export default function DashboardPage() {
                   onClick={() => {
                     if (typeof refreshPrices === 'function') {
                       refreshPrices();
-                    } else if ((window as any).refreshPricesDirectly) {
-                      (window as any).refreshPricesDirectly();
+                    } else if (window.refreshPricesDirectly) {
+                      window.refreshPricesDirectly();
                     }
                   }}
                   disabled={isFetchingPrices || !refreshPrices}
@@ -142,6 +152,7 @@ export default function DashboardPage() {
           }}
           onFetchingChange={setIsFetchingPrices}
           onDirectRefresh={() => {}}
+          onAddressUpdate={updateAddressChainData}
         />
       )}
     </div>
