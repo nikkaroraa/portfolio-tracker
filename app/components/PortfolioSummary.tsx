@@ -9,6 +9,7 @@ import { Address, ChainData } from "../types";
 import { usePrices } from "../hooks/usePrices";
 import { CHAIN_SYMBOLS } from "../lib/constants";
 import { AddressCard } from "./AddressCard";
+import { RecentTransactions } from "./RecentTransactions";
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("en-US", {
@@ -772,6 +773,11 @@ export function PortfolioSummary({
         )}
       </Card>
 
+      {/* Recent Transactions Section */}
+      <RecentTransactions 
+        addresses={addresses}
+        maxTransactions={20}
+      />
 
     </div>
   );
