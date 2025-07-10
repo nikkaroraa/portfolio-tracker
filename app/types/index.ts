@@ -18,6 +18,7 @@ export interface ChainData {
     type: "sent" | "received";
     asset?: string;
   }>;
+  error?: boolean; // Flag to indicate this chain had an error
 }
 
 export interface Tag {
@@ -112,6 +113,7 @@ export const SUPPORTED_TOKENS = [
   "SNX",
   "1INCH",
   "POL",
+  "FLUID",
 ];
 
 export const SUPPORTED_SPL_TOKENS: Record<

@@ -3,18 +3,37 @@ import { Transaction } from "../types";
 
 async function fetchBitcoinBalance(address: string) {
   const response = await fetch(`https://mempool.space/api/address/${address}`);
+  
   if (!response.ok) {
-    throw new Error("Failed to fetch balance");
+    if (response.status === 429) {
+      throw new Error("Rate limit exceeded. Please wait a moment before refreshing again.");
+    } else if (response.status === 404) {
+      throw new Error("Bitcoin address not found. Please check the address format.");
+    } else if (response.status >= 500) {
+      throw new Error("Mempool.space service is temporarily unavailable. Please try again later.");
+    }
+    throw new Error(`Failed to fetch Bitcoin balance (${response.status})`);
   }
+  
   const data = await response.json();
 
   // Get the recent transactions
   const transactionsResponse = await fetch(
     `https://mempool.space/api/address/${address}/txs`
   );
+  
   if (!transactionsResponse.ok) {
-    throw new Error("Failed to fetch transactions");
+    if (transactionsResponse.status === 429) {
+      throw new Error("Rate limit exceeded while fetching transactions. Please wait before trying again.");
+    }
+    // Don't fail completely if transactions fail, just return empty array
+    console.warn("Failed to fetch Bitcoin transactions:", transactionsResponse.status);
+    return {
+      balance: data.chain_stats.funded_txo_sum / 100000000,
+      lastTransactions: [],
+    };
   }
+  
   const transactions = (await transactionsResponse.json()) as Transaction[];
 
   // Process the last 5 transactions

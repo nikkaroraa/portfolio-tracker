@@ -9,7 +9,7 @@ import bs58 from "bs58";
 function getSolanaConnection() {
   const apiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
   if (!apiKey) {
-    throw new Error("NEXT_PUBLIC_ALCHEMY_API_KEY is required for Solana");
+    throw new Error("Alchemy API key is missing. Please check your environment configuration.");
   }
   const rpcUrl = `https://solana-mainnet.g.alchemy.com/v2/${apiKey}`;
   console.log("Solana RPC URL:", rpcUrl.replace(apiKey, "***"));
@@ -65,7 +65,20 @@ async function fetchSolanaBalance(address: string) {
     const connection = getSolanaConnection();
 
     // Get SOL balance
-    const balance = await connection.getBalance(publicKey);
+    let balance;
+    try {
+      balance = await connection.getBalance(publicKey);
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message.includes('429') || error.message.includes('rate')) {
+          throw new Error("Rate limit exceeded for Solana. Please wait before refreshing again.");
+        } else if (error.message.includes('Network') || error.message.includes('fetch')) {
+          throw new Error("Network error while fetching Solana data. Please check your connection.");
+        }
+      }
+      throw new Error("Failed to fetch Solana balance. Please try again later.");
+    }
+    
     const solBalance = balance / LAMPORTS_PER_SOL;
     const formattedSolBalance = Number(solBalance.toFixed(6));
 
@@ -194,7 +207,21 @@ async function fetchSolanaBalance(address: string) {
     };
   } catch (error) {
     console.error("Error fetching Solana balance:", error);
-    throw error;
+    
+    // Provide more user-friendly error messages
+    if (error instanceof Error) {
+      if (error.message.includes('Rate limit')) {
+        throw error; // Already formatted
+      } else if (error.message.includes('Invalid') || error.message.includes('address')) {
+        throw new Error("Invalid Solana address format. Please check the address.");
+      } else if (error.message.includes('Network')) {
+        throw error; // Already formatted
+      } else if (error.message.includes('Alchemy API key')) {
+        throw error; // Already formatted
+      }
+    }
+    
+    throw new Error("Failed to fetch Solana balance. Please try again later.");
   }
 }
 

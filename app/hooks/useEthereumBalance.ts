@@ -14,9 +14,14 @@ const networkMap: Record<string, Network> = {
 const ETHEREUM_CHAINS = ["ethereum", "arbitrum", "polygon", "optimism", "base"];
 
 function getAlchemyInstance(chain: string) {
+  const apiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
+  if (!apiKey) {
+    throw new Error("Alchemy API key is missing. Please check your environment configuration.");
+  }
+  
   const network = networkMap[chain] || Network.ETH_MAINNET;
   return new Alchemy({
-    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
+    apiKey,
     network,
   });
 }
@@ -50,7 +55,16 @@ async function fetchEthereumBalance(address: string, chain: string) {
 
   try {
     // Get ETH balance
-    const balance = await alchemy.core.getBalance(normalizedAddress, "latest");
+    let balance;
+    try {
+      balance = await alchemy.core.getBalance(normalizedAddress, "latest");
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('rate limit')) {
+        throw new Error(`Rate limit exceeded for ${chain}. Please wait before refreshing again.`);
+      }
+      throw new Error(`Failed to fetch ${chain} balance. Please check your connection and try again.`);
+    }
+    
     const ethBalance = Number(balance) / 1e18;
     const formattedEthBalance = Number(ethBalance.toFixed(6));
 
@@ -160,7 +174,19 @@ async function fetchEthereumBalance(address: string, chain: string) {
     };
   } catch (error) {
     console.error("Error fetching Ethereum balance:", error);
-    throw error;
+    
+    // Provide more user-friendly error messages
+    if (error instanceof Error) {
+      if (error.message.includes('Rate limit')) {
+        throw error; // Already formatted
+      } else if (error.message.includes('Invalid address')) {
+        throw new Error(`Invalid ${chain} address format. Please check the address.`);
+      } else if (error.message.includes('Network')) {
+        throw new Error(`Network error while fetching ${chain} data. Please check your connection.`);
+      }
+    }
+    
+    throw new Error(`Failed to fetch ${chain} balance. Please try again later.`);
   }
 }
 
@@ -177,17 +203,31 @@ async function fetchAllEthereumChains(address: string): Promise<ChainData[]> {
       } as ChainData;
     } catch (error) {
       console.error(`Error fetching data for ${chain}:`, error);
-      return {
-        chain,
-        balance: 0,
-        tokens: [],
-        lastTransactions: [],
-        lastUpdated: new Date(),
-      } as ChainData;
+      // Return null to indicate error, will be filtered out
+      return null;
     }
   });
 
-  return Promise.all(chainPromises);
+  const results = await Promise.all(chainPromises);
+  const successfulResults = results.filter((result): result is ChainData => result !== null);
+  
+  // If all chains failed, throw an error
+  if (successfulResults.length === 0) {
+    throw new Error("Failed to fetch data from any Ethereum network. Please try again later.");
+  }
+  
+  // Return successful results and default data for failed chains
+  return ETHEREUM_CHAINS.map(chain => {
+    const result = successfulResults.find(r => r.chain === chain);
+    return result || {
+      chain,
+      balance: 0,
+      tokens: [],
+      lastTransactions: [],
+      lastUpdated: new Date(),
+      error: true, // Flag to indicate this chain had an error
+    } as ChainData;
+  });
 }
 
 export function useEthereumBalance(address: string, chain: string) {

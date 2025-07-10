@@ -4,10 +4,42 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { TrendingUp, TrendingDown, DollarSign, PieChart, Coins, RefreshCw, AlertTriangle, ChevronDown, ChevronRight } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, PieChart, Coins, RefreshCw, AlertTriangle, ChevronDown, ChevronRight, Plus, Edit2, Trash2 } from "lucide-react";
 import { Address, ChainData } from "../types";
 import { usePrices } from "../hooks/usePrices";
 import { CHAIN_SYMBOLS } from "../lib/constants";
+import { AddressCard } from "./AddressCard";
+
+function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function getExplorerUrl(chain: string, txHash: string): string {
+  switch (chain) {
+    case "ethereum":
+      return `https://etherscan.io/tx/${txHash}`;
+    case "arbitrum":
+      return `https://arbiscan.io/tx/${txHash}`;
+    case "polygon":
+      return `https://polygonscan.com/tx/${txHash}`;
+    case "optimism":
+      return `https://optimistic.etherscan.io/tx/${txHash}`;
+    case "base":
+      return `https://basescan.org/tx/${txHash}`;
+    case "solana":
+      return `https://solscan.io/tx/${txHash}`;
+    case "bitcoin":
+      return `https://mempool.space/tx/${txHash}`;
+    default:
+      return "#";
+  }
+}
 
 interface AssetBreakdownItem {
   symbol: string;
@@ -45,9 +77,30 @@ interface PortfolioSummaryProps {
   onFetchingChange?: (isFetching: boolean) => void;
   onDirectRefresh?: () => void;
   onAddressUpdate?: (id: string, chainData: ChainData[]) => void;
+  // Wallet management props
+  onEdit?: (address: Address) => void;
+  onDelete?: (id: string) => void;
+  onAddClick?: () => void;
+  onBalanceUpdate?: (
+    id: string,
+    balance: number,
+    lastTransactions?: Address["lastTransactions"],
+    tokens?: Address["tokens"]
+  ) => void;
 }
 
-export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, onFetchingChange, onDirectRefresh, onAddressUpdate }: PortfolioSummaryProps) {
+export function PortfolioSummary({ 
+  addresses, 
+  onPriceUpdate, 
+  onRefreshCallback, 
+  onFetchingChange, 
+  onDirectRefresh, 
+  onAddressUpdate,
+  onEdit,
+  onDelete,
+  onAddClick,
+  onBalanceUpdate
+}: PortfolioSummaryProps) {
   const [showBreakdown, setShowBreakdown] = React.useState(false);
   
   // Get all Ethereum addresses (including L2s)
@@ -488,21 +541,34 @@ export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, 
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-lg">
               <Coins className="h-5 w-5" />
-              Asset Breakdown
+              Wallet Details
             </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowBreakdown(!showBreakdown)}
-              className="cursor-pointer"
-            >
-              {showBreakdown ? (
-                <ChevronDown className="h-4 w-4" />
-              ) : (
-                <ChevronRight className="h-4 w-4" />
+            <div className="flex items-center gap-2">
+              {onAddClick && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onAddClick}
+                  className="cursor-pointer"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Wallet
+                </Button>
               )}
-              {showBreakdown ? 'Hide' : 'Show'} Details
-            </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowBreakdown(!showBreakdown)}
+                className="cursor-pointer"
+              >
+                {showBreakdown ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+                {showBreakdown ? 'Hide' : 'Show'}
+              </Button>
+            </div>
           </div>
         </CardHeader>
         {showBreakdown && (
@@ -512,54 +578,188 @@ export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, 
                 Detailed breakdown of all assets by address and chain. Values sorted by USD amount.
               </div>
               
-              {assetBreakdown.length > 0 ? (
+              {addresses.length > 0 ? (
                 <div className="space-y-6">
-                  {assetBreakdown.map((addressData, index) => (
-                    <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                      <div className="bg-muted/30 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-semibold">{addressData.addressName}</div>
-                            <div className="text-xs text-muted-foreground font-mono">
-                              {addressData.address.slice(0, 8)}...{addressData.address.slice(-6)}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="font-semibold">{formatCurrency(addressData.totalValue)}</div>
-                            <div className="text-xs text-muted-foreground">{addressData.assets.length} assets</div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="p-4">
-                        <div className="space-y-3">
-                          {addressData.assets.map((asset, assetIndex) => (
-                            <div key={assetIndex} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
-                              <div className="flex items-center gap-3">
-                                <Badge variant="outline" className="text-xs">
-                                  {asset.chain}
-                                </Badge>
-                                <Badge variant={asset.type === 'native' ? 'default' : 'secondary'} className="text-xs">
-                                  {asset.type}
-                                </Badge>
-                                <div>
-                                  <div className="font-medium">{asset.symbol}</div>
-                                  {asset.name && asset.name !== asset.symbol && (
-                                    <div className="text-xs text-muted-foreground">{asset.name}</div>
-                                  )}
-                                </div>
+                  {addresses.map((address) => {
+                    // Find corresponding asset breakdown data
+                    const addressBreakdown = assetBreakdown.find(breakdown => 
+                      breakdown.address === address.address
+                    );
+                    
+                    return (
+                      <div key={address.id} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                        <div className="bg-muted/30 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="font-semibold">{address.name || 'Unnamed Wallet'}</div>
+                              <div className="text-xs text-muted-foreground font-mono">
+                                {address.address.slice(0, 12)}...{address.address.slice(-8)}
                               </div>
+                              {address.description && (
+                                <div className="text-xs text-muted-foreground mt-1">{address.description}</div>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
                               <div className="text-right">
-                                <div className="font-medium">{formatCurrency(asset.usdValue)}</div>
-                                <div className="text-xs text-muted-foreground font-mono">
-                                  {formatNumber(asset.balance)} {asset.symbol}
+                                <div className="font-semibold">
+                                  {addressBreakdown ? formatCurrency(addressBreakdown.totalValue) : 'Loading...'}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {addressBreakdown ? `${addressBreakdown.assets.length} assets` : ''}
                                 </div>
                               </div>
+                              {onEdit && onDelete && (
+                                <div className="flex gap-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => onEdit(address)}
+                                    className="cursor-pointer h-8 w-8 p-0"
+                                  >
+                                    <Edit2 className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => onDelete(address.id)}
+                                    className="cursor-pointer h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              )}
                             </div>
-                          ))}
+                          </div>
+                        </div>
+                        
+                        <div className="p-4 space-y-4">
+                          {/* Assets Section */}
+                          {addressBreakdown && addressBreakdown.assets.length > 0 && (
+                            <div>
+                              <h4 className="font-medium text-sm mb-3">Assets</h4>
+                              <div className="space-y-3">
+                                {addressBreakdown.assets.map((asset, assetIndex) => (
+                                  <div key={assetIndex} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
+                                    <div className="flex items-center gap-3">
+                                      <Badge variant="outline" className="text-xs">
+                                        {asset.chain}
+                                      </Badge>
+                                      <Badge variant={asset.type === 'native' ? 'default' : 'secondary'} className="text-xs">
+                                        {asset.type}
+                                      </Badge>
+                                      <div>
+                                        <div className="font-medium">{asset.symbol}</div>
+                                        {asset.name && asset.name !== asset.symbol && (
+                                          <div className="text-xs text-muted-foreground">{asset.name}</div>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
+                                      <div className="font-medium">{formatCurrency(asset.usdValue)}</div>
+                                      <div className="text-xs text-muted-foreground font-mono">
+                                        {formatNumber(asset.balance)} {asset.symbol}
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Recent Transactions Section */}
+                          {(() => {
+                            // Collect all transactions from all chains
+                            const allTransactions: Array<{tx: any, chain: string}> = [];
+                            
+                            // For ethereum addresses with chainData
+                            if (address.chain === 'ethereum' && address.chainData) {
+                              address.chainData.forEach(chainData => {
+                                if (chainData.lastTransactions) {
+                                  chainData.lastTransactions.forEach(tx => {
+                                    allTransactions.push({ tx, chain: chainData.chain });
+                                  });
+                                }
+                              });
+                            } else if (address.lastTransactions) {
+                              // For other chains (Bitcoin, Solana, etc)
+                              address.lastTransactions.forEach(tx => {
+                                allTransactions.push({ tx, chain: address.chain });
+                              });
+                            }
+                            
+                            if (allTransactions.length === 0) return null;
+                            
+                            // Sort by timestamp (newest first)
+                            allTransactions.sort((a, b) => {
+                              const aTime = a.chain === "bitcoin" ? a.tx.timestamp * 1000 : a.tx.timestamp;
+                              const bTime = b.chain === "bitcoin" ? b.tx.timestamp * 1000 : b.tx.timestamp;
+                              return bTime - aTime;
+                            });
+                            
+                            return (
+                              <div>
+                                <h4 className="font-medium text-sm mb-3">Recent Transactions</h4>
+                                <div className="overflow-x-auto rounded border bg-white dark:bg-card">
+                                  <table className="min-w-full text-sm">
+                                    <thead>
+                                      <tr className="border-b bg-muted/30">
+                                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">Date</th>
+                                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">Chain</th>
+                                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">Type</th>
+                                        <th className="px-4 py-3 text-right font-medium text-muted-foreground">Amount</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {allTransactions.slice(0, 10).map(({tx, chain}, txIndex) => {
+                                        const isReceived = tx.type === "received";
+                                        const timestampMs = chain === "bitcoin" ? tx.timestamp * 1000 : tx.timestamp;
+                                        return (
+                                          <tr key={`${tx.hash}-${txIndex}`} className="border-b last:border-0 hover:bg-muted/20">
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                              <a
+                                                href={getExplorerUrl(chain, tx.hash)}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline cursor-pointer"
+                                              >
+                                                {formatDate(new Date(timestampMs))}
+                                              </a>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                              <Badge variant="outline" className="text-xs">
+                                                {chain}
+                                              </Badge>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                              <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
+                                                isReceived
+                                                  ? "bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800"
+                                                  : "bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800"
+                                              }`}>
+                                                {isReceived ? "↓ Received" : "↑ Sent"}
+                                              </span>
+                                            </td>
+                                            <td className="px-4 py-3 font-mono text-right">
+                                              <span className={isReceived ? "text-green-600" : "text-red-600"}>
+                                                {isReceived ? "+" : "-"}{tx.value.toLocaleString(undefined, {
+                                                  minimumFractionDigits: 0,
+                                                  maximumFractionDigits: 6,
+                                                })} {tx.asset || CHAIN_SYMBOLS[chain as keyof typeof CHAIN_SYMBOLS]}
+                                              </span>
+                                            </td>
+                                          </tr>
+                                        );
+                                      })}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center text-muted-foreground py-8">
@@ -571,6 +771,7 @@ export function PortfolioSummary({ addresses, onPriceUpdate, onRefreshCallback, 
           </CardContent>
         )}
       </Card>
+
 
     </div>
   );

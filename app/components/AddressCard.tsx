@@ -9,7 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2, Edit2, RefreshCw, ChevronDown, ChevronRight } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Trash2, Edit2, RefreshCw, ChevronDown, ChevronRight, AlertCircle, Clock } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import {
   Address,
@@ -118,6 +119,8 @@ export function AddressCard({
       ? address.chainData[0].chain
       : address.chain
   );
+  const [lastError, setLastError] = useState<string | null>(null);
+  const [rateLimitCooldown, setRateLimitCooldown] = useState<number>(0);
   const chainInfo = getChainInfo(address.chain);
   const { refetch: refetchBitcoinBalance, isFetching: isFetchingBitcoin } =
     useBitcoinBalance(address.chain === "bitcoin" ? address.address : "");
@@ -131,6 +134,12 @@ export function AddressCard({
     useSolanaBalance(address.chain === "solana" ? address.address : "");
 
   const handleRefresh = useCallback(async () => {
+    if (rateLimitCooldown > 0) {
+      return;
+    }
+    
+    setLastError(null);
+    
     try {
       if (address.chain === "bitcoin") {
         const { data } = await refetchBitcoinBalance();
@@ -164,6 +173,14 @@ export function AddressCard({
       }
     } catch (error) {
       console.error("Failed to refresh balance:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to refresh balance";
+      setLastError(errorMessage);
+      
+      // Handle rate limit errors with cooldown
+      if (errorMessage.includes("Rate limit")) {
+        setRateLimitCooldown(30); // 30 second cooldown
+        setLastError("Rate limit exceeded. Please wait 30 seconds before trying again.");
+      }
     }
   }, [
     address.chain,
@@ -172,10 +189,21 @@ export function AddressCard({
     refetchAllChains,
     refetchSolanaBalance,
     onBalanceUpdate,
-    onChainDataUpdate
+    onChainDataUpdate,
+    rateLimitCooldown,
   ]);
 
   const isFetching = isFetchingBitcoin || isFetchingAllChains || isFetchingSolana;
+  
+  // Countdown timer for rate limit cooldown
+  useEffect(() => {
+    if (rateLimitCooldown > 0) {
+      const timer = setTimeout(() => {
+        setRateLimitCooldown(prev => Math.max(0, prev - 1));
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [rateLimitCooldown]);
 
   // Listen for refresh all event
   useEffect(() => {
@@ -247,12 +275,19 @@ export function AddressCard({
                 variant="ghost"
                 size="icon"
                 onClick={handleRefresh}
-                disabled={isFetching}
+                disabled={isFetching || rateLimitCooldown > 0}
                 className="cursor-pointer disabled:cursor-not-allowed"
               >
-                <RefreshCw
-                  className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
-                />
+                {rateLimitCooldown > 0 ? (
+                  <>
+                    <Clock className="h-4 w-4" />
+                    <span className="text-xs ml-1">{rateLimitCooldown}s</span>
+                  </>
+                ) : (
+                  <RefreshCw
+                    className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+                  />
+                )}
               </Button>
             )}
             <Button variant="ghost" size="icon" onClick={() => onEdit(address)} className="cursor-pointer">
@@ -271,6 +306,13 @@ export function AddressCard({
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
+          {/* Error Alert */}
+          {lastError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{lastError}</AlertDescription>
+            </Alert>
+          )}
           {/* Tags */}
           {address.tags && address.tags.length > 0 && (
             <div>
@@ -311,6 +353,9 @@ export function AddressCard({
                         <div className="flex items-center gap-2">
                           {info && <div className={`w-3 h-3 rounded-full ${info.color}`} />}
                           {info?.label || chainData.chain}
+                          {chainData.error && (
+                            <span className="text-xs text-red-500 ml-1">(Error)</span>
+                          )}
                         </div>
                       </SelectItem>
                     );
@@ -329,8 +374,15 @@ export function AddressCard({
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 6,
                   })} ${getChainSymbol(selectedChain)}`
+                : selectedChainData?.error
+                ? "Failed to fetch"
                 : "Not fetched yet"}
             </p>
+            {selectedChainData?.error && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Unable to fetch data for this chain. Try refreshing again.
+              </p>
+            )}
           </div>
 
           {/* Token Balances */}

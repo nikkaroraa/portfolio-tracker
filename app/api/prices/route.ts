@@ -31,6 +31,7 @@ const COINGECKO_IDS: Record<string, string> = {
   EUL: "euler",
   PENDLE: "pendle",
   INST: "instadapp",
+  FLUID: "instadapp",
   // Solana tokens
   mSOL: "msol",
   stSOL: "lido-staked-sol",
