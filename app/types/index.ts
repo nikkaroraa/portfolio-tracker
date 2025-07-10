@@ -112,6 +112,7 @@ export const SUPPORTED_TOKENS = [
   "MKR",
   "SNX",
   "1INCH",
+  "MATIC",
   "POL",
   "FLUID",
 ];

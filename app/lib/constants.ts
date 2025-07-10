@@ -34,7 +34,7 @@ export const CHAIN_SYMBOLS = {
   arbitrum: 'ETH', 
   optimism: 'ETH',
   base: 'ETH',
-  polygon: 'POL',
+  polygon: 'MATIC',
   solana: 'SOL',
 } as const;
 

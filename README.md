@@ -28,7 +28,7 @@
 | Bitcoin | BTC | Native | mempool.space | ✅ Active |
 | Ethereum | ETH | EVM | Alchemy | ✅ Active |
 | Arbitrum | ETH | L2 | Alchemy | ✅ Active |
-| Polygon | POL | L2 | Alchemy | ✅ Active |
+| Polygon | MATIC | L2 | Alchemy | ✅ Active |
 | Optimism | ETH | L2 | Alchemy | ✅ Active |
 | Base | ETH | L2 | Alchemy | ✅ Active |
 | Solana | SOL | Native | Alchemy | ✅ Active |
@@ -54,7 +54,8 @@
 | Maker | MKR | Lending |
 | Synthetix | SNX | Derivatives |
 | 1inch | 1INCH | DEX Aggregator |
-| Polygon | POL | L2 Native |
+| Polygon (MATIC) | MATIC | L2 Native |
+| Polygon Ecosystem | POL | Governance |
 | Euler | EUL | Lending |
 | Pendle | PENDLE | Yield Trading |
 | Instadapp | INST | DeFi Infrastructure |

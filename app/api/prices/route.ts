@@ -10,6 +10,7 @@ interface CoinGeckoPrice {
 const COINGECKO_IDS: Record<string, string> = {
   BTC: "bitcoin",
   ETH: "ethereum", 
+  MATIC: "matic-network",
   POL: "polygon-ecosystem-token",
   SOL: "solana",
   USDC: "usd-coin",
