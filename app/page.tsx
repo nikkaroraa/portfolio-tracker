@@ -36,7 +36,6 @@ export default function Page() {
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [selectedChain, setSelectedChain] = useState("all");
   const [selectedTag, setSelectedTag] = useState("all");
-  const [isRefreshingAll, setIsRefreshingAll] = useState(false);
   const [lastPriceUpdate, setLastPriceUpdate] = useState<Date | null>(null);
   const [lastPositionUpdate, setLastPositionUpdate] = useState<Date | null>(null);
   const [refreshPrices, setRefreshPrices] = useState<(() => Promise<void>) | null>(null);
@@ -109,19 +108,6 @@ export default function Page() {
     }
   };
 
-  const handleBalanceUpdate = async (
-    id: string,
-    balance: number,
-    lastTransactions?: Address["lastTransactions"],
-    tokens?: Address["tokens"]
-  ) => {
-    try {
-      await updateAddressBalance(id, balance, tokens, lastTransactions);
-    } catch (err) {
-      console.error('Failed to update balance:', err);
-    }
-  };
-
   const handleChainDataUpdate = async (id: string, chainData: ChainData[]) => {
     try {
       await updateAddressBalance(id, 0, undefined, undefined, chainData);
@@ -131,7 +117,6 @@ export default function Page() {
   };
 
   const handleRefreshAll = async () => {
-    setIsRefreshingAll(true);
     setIsFetchingPositions(true);
     
     // Dispatch a custom event that AddressCard components can listen to
@@ -144,7 +129,6 @@ export default function Page() {
     // Wait a bit for all the refreshes to complete
     // This is a simple approach - in a real app you might want more sophisticated coordination
     setTimeout(() => {
-      setIsRefreshingAll(false);
       setIsFetchingPositions(false);
       
     }, TIMEOUTS.REFRESH_DELAY);
@@ -297,7 +281,6 @@ export default function Page() {
                   }}
                   onDelete={handleDeleteAddress}
                   onAddClick={() => setIsAddDialogOpen(true)}
-                  onBalanceUpdate={handleBalanceUpdate}
                 />
               </div>
             </div>

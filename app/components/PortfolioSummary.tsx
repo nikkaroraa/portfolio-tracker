@@ -8,7 +8,6 @@ import { TrendingUp, TrendingDown, DollarSign, PieChart, Coins, RefreshCw, Alert
 import { Address, ChainData } from "../types";
 import { usePrices } from "../hooks/usePrices";
 import { CHAIN_SYMBOLS } from "../lib/constants";
-import { AddressCard } from "./AddressCard";
 import { RecentTransactions } from "./RecentTransactions";
 
 function formatDate(date: Date): string {
@@ -82,12 +81,6 @@ interface PortfolioSummaryProps {
   onEdit?: (address: Address) => void;
   onDelete?: (id: string) => void;
   onAddClick?: () => void;
-  onBalanceUpdate?: (
-    id: string,
-    balance: number,
-    lastTransactions?: Address["lastTransactions"],
-    tokens?: Address["tokens"]
-  ) => void;
 }
 
 export function PortfolioSummary({ 
@@ -99,8 +92,7 @@ export function PortfolioSummary({
   onAddressUpdate,
   onEdit,
   onDelete,
-  onAddClick,
-  onBalanceUpdate
+  onAddClick
 }: PortfolioSummaryProps) {
   const [showBreakdown, setShowBreakdown] = React.useState(false);
   
@@ -670,7 +662,7 @@ export function PortfolioSummary({
                           {/* Recent Transactions Section */}
                           {(() => {
                             // Collect all transactions from all chains
-                            const allTransactions: Array<{tx: any, chain: string}> = [];
+                            const allTransactions: Array<{tx: NonNullable<Address['lastTransactions']>[0], chain: string}> = [];
                             
                             // For ethereum addresses with chainData
                             if (address.chain === 'ethereum' && address.chainData) {

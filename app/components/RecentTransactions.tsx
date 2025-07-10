@@ -37,7 +37,7 @@ function getExplorerUrl(chain: string, txHash: string): string {
 }
 
 interface TransactionWithContext {
-  tx: any;
+  tx: NonNullable<Address['lastTransactions']>[0];
   chain: string;
   walletName: string;
   walletAddress: string;

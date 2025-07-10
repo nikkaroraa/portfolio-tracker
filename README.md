@@ -13,6 +13,7 @@
 - 📊 **Real-time Portfolio Dashboard**: Comprehensive overview with charts and analytics
 - 💰 **Balance Tracking**: Fetch current balances and token holdings automatically
 - 📋 **Transaction History**: View recent transactions across all supported networks
+- 🕒 **Recent Transactions**: Cross-wallet transaction feed showing latest 20 transactions
 - 🏷️ **Token Support**: Track popular tokens like USDC, USDT, WETH, ARB, and more
 - 🎨 **Modern UI**: Clean interface built with Radix UI and Tailwind CSS
 - 🔒 **Privacy-First**: Self-hosted solution - your data stays with you
@@ -22,14 +23,64 @@
 
 ## 🌐 Supported Networks
 
-| Network | Symbol | Type | API Provider |
-|---------|--------|------|--------------|
-| Bitcoin | BTC | Native | mempool.space |
-| Ethereum | ETH | EVM | Alchemy |
-| Arbitrum | ARB | L2 | Alchemy |
-| Polygon | MATIC | L2 | Alchemy |
-| Optimism | OP | L2 | Alchemy |
-| Base | BASE | L2 | Alchemy |
+| Network | Symbol | Type | API Provider | Status |
+|---------|--------|------|--------------|--------|
+| Bitcoin | BTC | Native | mempool.space | ✅ Active |
+| Ethereum | ETH | EVM | Alchemy | ✅ Active |
+| Arbitrum | ETH | L2 | Alchemy | ✅ Active |
+| Polygon | POL | L2 | Alchemy | ✅ Active |
+| Optimism | ETH | L2 | Alchemy | ✅ Active |
+| Base | ETH | L2 | Alchemy | ✅ Active |
+| Solana | SOL | Native | Alchemy | ✅ Active |
+
+## 🪙 Supported Tokens
+
+### ERC-20 Tokens (Ethereum & L2s)
+| Token | Symbol | Category |
+|-------|--------|----------|
+| USD Coin | USDC | Stablecoin |
+| Tether | USDT | Stablecoin |
+| Dai | DAI | Stablecoin |
+| Wrapped Ethereum | WETH | Wrapped Asset |
+| Wrapped Bitcoin | WBTC | Wrapped Asset |
+| Wrapped Staked ETH | WSTETH | Liquid Staking |
+| Staked Ether | stETH | Liquid Staking |
+| Rocket Pool ETH | RETH | Liquid Staking |
+| Chainlink | LINK | Oracle |
+| Uniswap | UNI | DEX |
+| Aave | AAVE | Lending |
+| Curve DAO | CRV | DEX |
+| Compound | COMP | Lending |
+| Maker | MKR | Lending |
+| Synthetix | SNX | Derivatives |
+| 1inch | 1INCH | DEX Aggregator |
+| Polygon | POL | L2 Native |
+| Euler | EUL | Lending |
+| Pendle | PENDLE | Yield Trading |
+| Instadapp | INST | DeFi Infrastructure |
+| Fluid | FLUID | DeFi Protocol |
+
+### SPL Tokens (Solana)
+| Token | Symbol | Category |
+|-------|--------|----------|
+| USD Coin | USDC | Stablecoin |
+| Tether | USDT | Stablecoin |
+| Wrapped Ethereum | WETH | Wrapped Asset |
+| Wrapped Bitcoin | WBTC | Wrapped Asset |
+| Wrapped SOL | SOL | Native Wrapped |
+| Marinade SOL | mSOL | Liquid Staking |
+| Lido Staked SOL | stSOL | Liquid Staking |
+| BlazeStake SOL | bSOL | Liquid Staking |
+| Jito Staked SOL | jitoSOL | Liquid Staking |
+| Coinbase Wrapped BTC | cbBTC | Wrapped Asset |
+| Jupiter | JUP | DEX |
+| DUST Protocol | DUST | Gaming |
+| Pyth Network | PYTH | Oracle |
+| STEPN | GMT | Move-to-Earn |
+| Orca | ORCA | DEX |
+| Saber | SBR | Stableswap |
+
+*Automatic token detection: The app automatically detects and displays any ERC-20/SPL tokens in your wallets, even if not listed above.*
 
 ## 🎯 Demo Mode
 
@@ -77,15 +128,12 @@ Open [http://localhost:3000](http://localhost:3000) and click "Load Demo Address
 
 3. **Add your API keys** (edit `.env.local`):
    ```env
-   # Required for live Ethereum data
+   # Required for live Ethereum/Solana data
    NEXT_PUBLIC_ALCHEMY_API_KEY=your_alchemy_api_key_here
    
-   # Optional: Database persistence
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   # Optional: Database persistence (Supabase)
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   
-   # Optional: App password protection
-   CRYPTO_TRACKER_PASSWORD=your_secure_password
    ```
 
 4. **Start the app**
@@ -100,16 +148,51 @@ Open [http://localhost:3000](http://localhost:3000) and click "Load Demo Address
 
 #### Alchemy API Key (Required for Live Data)
 
-1. Visit [alchemy.com](https://alchemy.com) and create a free account
-2. Create a new app and select your desired networks
-3. Copy your API key to `NEXT_PUBLIC_ALCHEMY_API_KEY` in `.env.local`
-4. Free tier includes 300M requests/month - perfect for personal use!
+**What it enables:** Live balance and transaction data for Ethereum, Arbitrum, Polygon, Optimism, Base, and Solana networks.
+
+1. **Create Account**: Visit [alchemy.com](https://alchemy.com) and sign up for free
+2. **Create App**: 
+   - Click "Create new app"
+   - Choose "Ethereum" as chain (supports all EVM networks)
+   - Select "Mainnet" network
+   - Name your app (e.g., "Portfolio Tracker")
+3. **Get API Key**: Copy your API key from the dashboard
+4. **Add to Environment**: Paste into `NEXT_PUBLIC_ALCHEMY_API_KEY` in `.env.local`
+
+**Free Tier**: 300M compute units/month (plenty for personal portfolio tracking)
+
+**Networks Supported**: Ethereum, Arbitrum, Polygon, Optimism, Base, Solana
 
 #### Supabase (Optional - for data persistence)
 
-1. Visit [supabase.com](https://supabase.com) and create a project
-2. Navigate to Settings → API to get your keys
-3. Add to `.env.local` for automatic wallet data backup
+**What it enables:** Automatic backup of your wallet addresses and settings across devices.
+
+1. **Create Project**: Visit [supabase.com](https://supabase.com) and create a new project
+2. **Get Credentials**: 
+   - Go to Settings → API
+   - Copy "Project URL" → `NEXT_PUBLIC_SUPABASE_URL`
+   - Copy "anon public key" → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+3. **Run Migrations**: Set up database tables with `npm run db:push`
+
+**Without Supabase**: Wallet data is stored in browser localStorage only.
+
+#### Running Supabase Migrations
+
+After setting up Supabase credentials, create the required database tables:
+
+```bash
+# Push migrations to your Supabase instance
+npm run db:push
+
+# Alternative: Manual SQL execution
+# Copy the SQL from supabase/migrations/ files and run in Supabase SQL Editor
+```
+
+**Available migration commands:**
+- `npm run db:push` - Apply migrations to remote Supabase
+- `npm run db:pull` - Pull schema changes from remote
+- `npm run db:reset` - Reset local database  
+- `npm run db:status` - Check connection status
 
 ## 📖 Usage Guide
 
@@ -143,10 +226,14 @@ This app is built with modern web technologies for optimal performance and devel
 - **APIs**: Direct integration with blockchain providers
 
 ### Data Sources
-| Provider | Networks | Rate Limits | Cost |
-|----------|----------|-------------|------|
-| mempool.space | Bitcoin | Public API | Free |
-| Alchemy | Ethereum + L2s | 300M req/month | Free tier |
+| Provider | Networks | Rate Limits | Cost | Notes |
+|----------|----------|-------------|------|-------|
+| mempool.space | Bitcoin | Public API | Free | No API key required |
+| Alchemy | Ethereum + L2s + Solana | 300M req/month | Free tier | Single API key for all networks |
+
+**Bitcoin**: Uses public mempool.space API - works immediately without any setup
+**Ethereum & L2s**: Requires Alchemy API key for live data  
+**Solana**: Uses Alchemy's Solana RPC for balance and transaction data
 
 ### Key Components
 - **AddressCard**: Individual wallet display with real-time balance updates

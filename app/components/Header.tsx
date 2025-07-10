@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Wallet, Tag as TagIcon } from "lucide-react";
+import { Plus, Tag as TagIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
