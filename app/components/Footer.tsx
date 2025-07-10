@@ -30,7 +30,7 @@ export function Footer() {
         
         <div className="mt-4 pt-4 border-t border-border/40">
           <p className="text-xs text-muted-foreground text-center">
-            Multi-chain portfolio tracker for Bitcoin, Ethereum, and Layer 2 networks
+            Multi-chain portfolio tracker for Bitcoin, Ethereum, and Solana
           </p>
         </div>
       </div>
