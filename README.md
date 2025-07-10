@@ -17,7 +17,7 @@
 - 🏷️ **Token Support**: Track popular tokens like USDC, USDT, WETH, ARB, and more
 - 🎨 **Modern UI**: Clean interface built with Radix UI and Tailwind CSS
 - 🔒 **Privacy-First**: Self-hosted solution - your data stays with you
-- 🚀 **Demo Mode**: Try it out instantly with famous crypto addresses
+- 🚀 **Easy Setup**: Get started in minutes with or without API keys
 - ⚡ **Rate Limit Handling**: Smart error handling with retry mechanisms
 - 📱 **Responsive Design**: Works perfectly on desktop and mobile
 
@@ -82,16 +82,26 @@
 
 *Automatic token detection: The app automatically detects and displays any ERC-20/SPL tokens in your wallets, even if not listed above.*
 
-## 🎯 Demo Mode
+## 💡 Try It Out
 
-**Try it out instantly!** The app includes a demo mode with famous crypto addresses:
+**Want to test the app?** Here are some ideas to get started:
 
+### Public Addresses You Can Track
 - **Vitalik Buterin** (Ethereum founder) - `0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045`
 - **Coinbase CEO** - `0x503828976D22510aad0201ac7EC88293211D23Da`
 - **Satoshi Era Wallet** - `1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa`
-- **DeFi Whale** - Large DeFi investor portfolio
 
-Demo mode automatically activates when no API keys are configured, allowing you to explore all features with realistic data.
+### Getting Started Ideas
+- 🎯 **Start with Bitcoin**: No API key needed - just add any Bitcoin address
+- 🔍 **Explore famous wallets**: Track well-known crypto addresses to see the UI
+- 🚀 **Test with your own**: Add your wallet addresses for live portfolio tracking
+- 📊 **Mix networks**: Try addresses from different blockchains (Bitcoin, Ethereum, Solana)
+- 🏷️ **Use tags**: Organize wallets by categories (DeFi, Trading, Long-term, etc.)
+
+### Without API Keys
+- ✅ Bitcoin tracking works immediately (uses public mempool.space API)
+- ✅ App interface and all features are fully functional
+- ⚠️ Ethereum/Solana balances will show as "not fetched" until you add Alchemy API key
 
 ## 🚀 Getting Started
 
@@ -103,14 +113,14 @@ Demo mode automatically activates when no API keys are configured, allowing you 
 
 ### ⚡ Quick Start
 
-**Option 1: Try Demo Mode (No setup required)**
+**Option 1: Quick Start (Bitcoin tracking works immediately)**
 ```bash
 git clone https://github.com/your-username/portfolio-tracker.git
 cd portfolio-tracker
 npm install
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) and click "Load Demo Addresses" to explore with sample data!
+Open [http://localhost:3000](http://localhost:3000) and add a Bitcoin address to start tracking!
 
 **Option 2: Full Setup with Live Data**
 
@@ -203,16 +213,16 @@ npm run db:push
 - Add tags and descriptions for organization
 
 ### Portfolio Dashboard
-- Switch to the "Dashboard" tab for comprehensive analytics
-- View total portfolio value across all networks
-- See individual token holdings and their USD values
-- Track transaction history and portfolio changes
+- View comprehensive analytics with charts and breakdowns
+- See total portfolio value across all networks
+- Track individual token holdings and their USD values
+- Monitor recent transactions across all wallets
 
-### Demo Mode Features
-- Instant access to realistic portfolio data
-- Explore all features without API setup
-- Based on publicly known crypto addresses
-- Perfect for screenshots, demos, and testing
+### Key Features
+- 🔄 **Real-time Updates**: Refresh balances and transactions with one click
+- 📊 **Portfolio Analytics**: Visual breakdown by chains and token holdings
+- 🕒 **Transaction Feed**: Recent transactions across all your wallets
+- 🏷️ **Organization**: Tag and categorize wallets for easy management
 
 ## 🏗️ Architecture
 
