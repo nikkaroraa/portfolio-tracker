@@ -113,6 +113,20 @@ export function calculatePortfolioSummary(
             const balance = Number(token.balance);
             const usdValue = balance * price;
             
+            // Debug logs for POL token specifically
+            if (token.symbol === "POL") {
+              console.log("💰 POL Portfolio Calculation:", {
+                symbol: token.symbol,
+                name: token.name,
+                balance: balance,
+                price: price,
+                usdValue: usdValue,
+                chain: chainData.chain,
+                rawTokenBalance: token.balance,
+                priceData: prices[token.symbol]
+              });
+            }
+            
             totalValue += usdValue;
             totalChange24h += usdValue * (prices[token.symbol]?.change24h || 0) / 100;
 

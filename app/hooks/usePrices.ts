@@ -25,6 +25,18 @@ async function fetchPrices(symbols: string[]): Promise<Record<string, PriceData>
   }
 
   const data = await response.json();
+  
+  // Debug logs for POL token price specifically
+  if (symbols.includes('POL') && data.POL) {
+    console.log("💲 POL Price Data:", {
+      symbol: 'POL',
+      price: data.POL.price,
+      change24h: data.POL.change24h,
+      requestedSymbols: symbols,
+      allPrices: data
+    });
+  }
+  
   return data;
 }
 
