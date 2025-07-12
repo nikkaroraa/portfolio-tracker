@@ -23,76 +23,80 @@
 
 ## 🌐 Supported Networks
 
-| Network | Symbol | Type | API Provider | Status |
-|---------|--------|------|--------------|--------|
-| Bitcoin | BTC | Native | mempool.space | ✅ Active |
-| Ethereum | ETH | EVM | Alchemy | ✅ Active |
-| Arbitrum | ETH | L2 | Alchemy | ✅ Active |
-| Polygon | MATIC | L2 | Alchemy | ✅ Active |
-| Optimism | ETH | L2 | Alchemy | ✅ Active |
-| Base | ETH | L2 | Alchemy | ✅ Active |
-| Solana | SOL | Native | Alchemy | ✅ Active |
+| Network  | Symbol | Type   | API Provider  | Status    |
+| -------- | ------ | ------ | ------------- | --------- |
+| Bitcoin  | BTC    | Native | mempool.space | ✅ Active |
+| Ethereum | ETH    | EVM    | Alchemy       | ✅ Active |
+| Arbitrum | ETH    | L2     | Alchemy       | ✅ Active |
+| Polygon  | MATIC  | L2     | Alchemy       | ✅ Active |
+| Optimism | ETH    | L2     | Alchemy       | ✅ Active |
+| Base     | ETH    | L2     | Alchemy       | ✅ Active |
+| Solana   | SOL    | Native | Alchemy       | ✅ Active |
 
 ## 🪙 Supported Tokens
 
 ### ERC-20 Tokens (Ethereum & L2s)
-| Token | Symbol | Category |
-|-------|--------|----------|
-| USD Coin | USDC | Stablecoin |
-| Tether | USDT | Stablecoin |
-| Dai | DAI | Stablecoin |
-| Wrapped Ethereum | WETH | Wrapped Asset |
-| Wrapped Bitcoin | WBTC | Wrapped Asset |
-| Wrapped Staked ETH | WSTETH | Liquid Staking |
-| Staked Ether | stETH | Liquid Staking |
-| Rocket Pool ETH | RETH | Liquid Staking |
-| Chainlink | LINK | Oracle |
-| Uniswap | UNI | DEX |
-| Aave | AAVE | Lending |
-| Curve DAO | CRV | DEX |
-| Compound | COMP | Lending |
-| Maker | MKR | Lending |
-| Synthetix | SNX | Derivatives |
-| 1inch | 1INCH | DEX Aggregator |
-| Polygon (MATIC) | MATIC | L2 Native |
-| Polygon Ecosystem | POL | Governance |
-| Euler | EUL | Lending |
-| Pendle | PENDLE | Yield Trading |
-| Instadapp | INST | DeFi Infrastructure |
-| Fluid | FLUID | DeFi Protocol |
+
+| Token              | Symbol | Category            |
+| ------------------ | ------ | ------------------- |
+| USD Coin           | USDC   | Stablecoin          |
+| Tether             | USDT   | Stablecoin          |
+| Dai                | DAI    | Stablecoin          |
+| Wrapped Ethereum   | WETH   | Wrapped Asset       |
+| Wrapped Bitcoin    | WBTC   | Wrapped Asset       |
+| Wrapped Staked ETH | WSTETH | Liquid Staking      |
+| Staked Ether       | stETH  | Liquid Staking      |
+| Rocket Pool ETH    | RETH   | Liquid Staking      |
+| Chainlink          | LINK   | Oracle              |
+| Uniswap            | UNI    | DEX                 |
+| Aave               | AAVE   | Lending             |
+| Curve DAO          | CRV    | DEX                 |
+| Compound           | COMP   | Lending             |
+| Maker              | MKR    | Lending             |
+| Synthetix          | SNX    | Derivatives         |
+| 1inch              | 1INCH  | DEX Aggregator      |
+| Polygon (MATIC)    | MATIC  | L2 Native           |
+| Polygon Ecosystem  | POL    | Governance          |
+| Euler              | EUL    | Lending             |
+| Pendle             | PENDLE | Yield Trading       |
+| Instadapp          | INST   | DeFi Infrastructure |
+| Fluid              | FLUID  | DeFi Protocol       |
 
 ### SPL Tokens (Solana)
-| Token | Symbol | Category |
-|-------|--------|----------|
-| USD Coin | USDC | Stablecoin |
-| Tether | USDT | Stablecoin |
-| Wrapped Ethereum | WETH | Wrapped Asset |
-| Wrapped Bitcoin | WBTC | Wrapped Asset |
-| Wrapped SOL | SOL | Native Wrapped |
-| Marinade SOL | mSOL | Liquid Staking |
-| Lido Staked SOL | stSOL | Liquid Staking |
-| BlazeStake SOL | bSOL | Liquid Staking |
-| Jito Staked SOL | jitoSOL | Liquid Staking |
-| Coinbase Wrapped BTC | cbBTC | Wrapped Asset |
-| Jupiter | JUP | DEX |
-| DUST Protocol | DUST | Gaming |
-| Pyth Network | PYTH | Oracle |
-| STEPN | GMT | Move-to-Earn |
-| Orca | ORCA | DEX |
-| Saber | SBR | Stableswap |
 
-*Automatic token detection: The app automatically detects and displays any ERC-20/SPL tokens in your wallets, even if not listed above.*
+| Token                | Symbol  | Category       |
+| -------------------- | ------- | -------------- |
+| USD Coin             | USDC    | Stablecoin     |
+| Tether               | USDT    | Stablecoin     |
+| Wrapped Ethereum     | WETH    | Wrapped Asset  |
+| Wrapped Bitcoin      | WBTC    | Wrapped Asset  |
+| Wrapped SOL          | SOL     | Native Wrapped |
+| Marinade SOL         | mSOL    | Liquid Staking |
+| Lido Staked SOL      | stSOL   | Liquid Staking |
+| BlazeStake SOL       | bSOL    | Liquid Staking |
+| Jito Staked SOL      | jitoSOL | Liquid Staking |
+| Coinbase Wrapped BTC | cbBTC   | Wrapped Asset  |
+| Jupiter              | JUP     | DEX            |
+| DUST Protocol        | DUST    | Gaming         |
+| Pyth Network         | PYTH    | Oracle         |
+| STEPN                | GMT     | Move-to-Earn   |
+| Orca                 | ORCA    | DEX            |
+| Saber                | SBR     | Stableswap     |
+
+_Automatic token detection: The app automatically detects and displays any ERC-20/SPL tokens in your wallets, even if not listed above._
 
 ## 💡 Try It Out
 
 **Want to test the app?** Here are some ideas to get started:
 
 ### Public Addresses You Can Track
+
 - **Vitalik Buterin** (Ethereum founder) - `0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045`
 - **Coinbase CEO** - `0x503828976D22510aad0201ac7EC88293211D23Da`
 - **Satoshi Era Wallet** - `1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa`
 
 ### Getting Started Ideas
+
 - 🎯 **Start with Bitcoin**: No API key needed - just add any Bitcoin address
 - 🔍 **Explore famous wallets**: Track well-known crypto addresses to see the UI
 - 🚀 **Test with your own**: Add your wallet addresses for live portfolio tracking
@@ -100,6 +104,7 @@
 - 🏷️ **Use tags**: Organize wallets by categories (DeFi, Trading, Long-term, etc.)
 
 ### Without API Keys
+
 - ✅ Bitcoin tracking works immediately (uses public mempool.space API)
 - ✅ App interface and all features are fully functional
 - ⚠️ Ethereum/Solana balances will show as "not fetched" until you add Alchemy API key
@@ -108,46 +113,55 @@
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm, yarn, or pnpm
 - (Optional) Alchemy API key for live Ethereum data
 
 ### ⚡ Quick Start
 
 **Option 1: Quick Start (Bitcoin tracking works immediately)**
+
 ```bash
-git clone https://github.com/your-username/portfolio-tracker.git
+git clone https://github.com/nikkaroraa/portfolio-tracker.git
 cd portfolio-tracker
 npm install
 npm run dev
 ```
+
 Open [http://localhost:3000](http://localhost:3000) and add a Bitcoin address to start tracking!
 
 **Option 2: Full Setup with Live Data**
 
 1. **Clone and install**
+
    ```bash
-   git clone https://github.com/your-username/portfolio-tracker.git
+   git clone https://github.com/nikkaroraa/portfolio-tracker.git
    cd portfolio-tracker
    npm install
    ```
 
 2. **Configure environment**
+
    ```bash
    cp .env.example .env.local
    ```
 
 3. **Add your API keys** (edit `.env.local`):
+
    ```env
    # Required for live Ethereum/Solana data
    NEXT_PUBLIC_ALCHEMY_API_KEY=your_alchemy_api_key_here
-   
+
    # Optional: Database persistence (Supabase)
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+   # Authentication (see Authentication section below)
+   AUTH_REQUIRED=false  # Set to true for password protection
    ```
 
 4. **Start the app**
+
    ```bash
    npm run dev
    ```
@@ -162,7 +176,7 @@ Open [http://localhost:3000](http://localhost:3000) and add a Bitcoin address to
 **What it enables:** Live balance and transaction data for Ethereum, Arbitrum, Polygon, Optimism, Base, and Solana networks.
 
 1. **Create Account**: Visit [alchemy.com](https://alchemy.com) and sign up for free
-2. **Create App**: 
+2. **Create App**:
    - Click "Create new app"
    - Choose "Ethereum" as chain (supports all EVM networks)
    - Select "Mainnet" network
@@ -179,7 +193,7 @@ Open [http://localhost:3000](http://localhost:3000) and add a Bitcoin address to
 **What it enables:** Automatic backup of your wallet addresses and settings across devices.
 
 1. **Create Project**: Visit [supabase.com](https://supabase.com) and create a new project
-2. **Get Credentials**: 
+2. **Get Credentials**:
    - Go to Settings → API
    - Copy "Project URL" → `NEXT_PUBLIC_SUPABASE_URL`
    - Copy "anon public key" → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -200,26 +214,30 @@ npm run db:push
 ```
 
 **Available migration commands:**
+
 - `npm run db:push` - Apply migrations to remote Supabase
 - `npm run db:pull` - Pull schema changes from remote
-- `npm run db:reset` - Reset local database  
+- `npm run db:reset` - Reset local database
 - `npm run db:status` - Check connection status
 
 ## 📖 Usage Guide
 
 ### Adding Wallets
+
 - Click the "Wallets" tab on the main page
 - Click "Add Address" to input your wallet addresses
 - Choose the appropriate blockchain network
 - Add tags and descriptions for organization
 
 ### Portfolio Dashboard
+
 - View comprehensive analytics with charts and breakdowns
 - See total portfolio value across all networks
 - Track individual token holdings and their USD values
 - Monitor recent transactions across all wallets
 
 ### Key Features
+
 - 🔄 **Real-time Updates**: Refresh balances and transactions with one click
 - 📊 **Portfolio Analytics**: Visual breakdown by chains and token holdings
 - 🕒 **Transaction Feed**: Recent transactions across all your wallets
@@ -230,6 +248,7 @@ npm run db:push
 This app is built with modern web technologies for optimal performance and developer experience:
 
 ### Tech Stack
+
 - **Framework**: Next.js 15 with React 19 and TypeScript
 - **Styling**: Tailwind CSS with Radix UI primitives
 - **State Management**: React Query for server state + React hooks for local state
@@ -237,16 +256,18 @@ This app is built with modern web technologies for optimal performance and devel
 - **APIs**: Direct integration with blockchain providers
 
 ### Data Sources
-| Provider | Networks | Rate Limits | Cost | Notes |
-|----------|----------|-------------|------|-------|
-| mempool.space | Bitcoin | Public API | Free | No API key required |
-| Alchemy | Ethereum + L2s + Solana | 300M req/month | Free tier | Single API key for all networks |
+
+| Provider      | Networks                | Rate Limits    | Cost      | Notes                           |
+| ------------- | ----------------------- | -------------- | --------- | ------------------------------- |
+| mempool.space | Bitcoin                 | Public API     | Free      | No API key required             |
+| Alchemy       | Ethereum + L2s + Solana | 300M req/month | Free tier | Single API key for all networks |
 
 **Bitcoin**: Uses public mempool.space API - works immediately without any setup
 **Ethereum & L2s**: Requires Alchemy API key for live data  
 **Solana**: Uses Alchemy's Solana RPC for balance and transaction data
 
 ### Key Components
+
 - **AddressCard**: Individual wallet display with real-time balance updates
 - **PortfolioSummary**: Comprehensive dashboard with analytics
 - **RateLimitNotification**: Smart error handling for API limits
@@ -255,6 +276,7 @@ This app is built with modern web technologies for optimal performance and devel
 ## 🛠️ Development
 
 ### Commands
+
 ```bash
 npm run dev          # Start development server with hot reload
 npm run build        # Build for production
@@ -264,6 +286,7 @@ npm run type-check   # TypeScript type checking
 ```
 
 ### Project Structure
+
 ```
 app/
 ├── components/          # React components
@@ -280,22 +303,81 @@ components/ui/          # Reusable UI components (Radix UI)
 This application is designed with privacy as a core principle:
 
 ### Your Data Stays Private
+
 - ✅ **Self-hosted**: Run on your own infrastructure
 - ✅ **Local storage**: Data stored in your browser or your own database
-- ✅ **No tracking**: No analytics, no user tracking, no data collection
+- ✅ **Privacy-focused analytics**: Only basic page views via Vercel Analytics (no personal data)
 - ✅ **Open source**: Full transparency - audit the code yourself
 
 ### API Usage
+
 - Only blockchain APIs (Alchemy, mempool.space) are contacted for balance data
 - Your wallet addresses are only sent to these APIs to fetch balances
 - No personal information is ever transmitted
 - All API calls are made directly from your browser
 
 ### Security Best Practices
+
 - Password protection for app access (optional)
 - No sensitive data stored in browser local storage
 - Environment variables for API keys
 - Rate limiting protection
+
+## 🔐 Authentication
+
+This app supports two deployment modes to suit different needs:
+
+### Demo/Public Mode
+
+Perfect for showcasing or sharing with the community:
+
+```env
+AUTH_REQUIRED=false
+```
+
+### Personal/Private Mode
+
+Secure your personal portfolio with password protection:
+
+```env
+AUTH_REQUIRED=true
+BASIC_AUTH_USER=your_username
+BASIC_AUTH_PASSWORD=your_secure_password
+```
+
+### How It Works
+
+When `AUTH_REQUIRED=true`:
+
+- The app prompts for username/password via browser's native auth dialog
+- Credentials are validated against your environment variables
+- Works in both development and production environments
+
+### Deployment Examples
+
+**Vercel**: Add environment variables in project settings
+
+- Demo: Only set `AUTH_REQUIRED=false`
+- Personal: Set all three auth variables
+
+**Local Development**: Configure in `.env.local`
+
+```env
+# Demo mode
+AUTH_REQUIRED=false
+
+# Personal mode
+AUTH_REQUIRED=true
+BASIC_AUTH_USER=admin
+BASIC_AUTH_PASSWORD=mySecurePassword123
+```
+
+### Security Tips
+
+- Use strong passwords (mix of letters, numbers, symbols)
+- Never commit `.env.local` to version control
+- Use different credentials for dev and production
+- Consider password managers for generating secure passwords
 
 ## 🤝 Contributing
 
@@ -320,6 +402,7 @@ We welcome contributions! Here's how to get started:
    ```
 
 ### Development Guidelines
+
 - Use TypeScript for new components
 - Follow the existing folder structure
 - Test on multiple networks before submitting
@@ -328,6 +411,7 @@ We welcome contributions! Here's how to get started:
 ## 📋 Roadmap
 
 ### Upcoming Features
+
 - [ ] 🌟 **Solana Support**: Full Solana network integration
 - [ ] 🔍 **Advanced Analytics**: Portfolio performance charts and metrics
 - [ ] 📱 **Mobile App**: React Native companion app
@@ -336,6 +420,7 @@ We welcome contributions! Here's how to get started:
 - [ ] 🔗 **DeFi Integration**: Track LP positions and staking rewards
 
 ### Integrations Planned
+
 - [ ] ENS (Ethereum Name Service) resolution
 - [ ] NFT portfolio tracking
 - [ ] Hardware wallet integration
@@ -348,6 +433,7 @@ This project is open source and available under the [MIT License](LICENSE).
 ## ⭐ Support
 
 If you find this project helpful:
+
 - Give it a star ⭐
 - Share it with the crypto community
 - Contribute to the codebase
